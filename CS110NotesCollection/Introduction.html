@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Introduction</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="introduction">Introduction</h1>
+<p>Monday, April 03,  2017</p>
+<h2 id="01-prerequisites">0.1 Prerequisites</h2>
+<ul>
+<li>Programming languages: C, C++</li>
+<li>Tools: <code>gcc</code>, <code>g++</code>, <code>gdb</code>, <code>valgrind</code> (memory-leak checker), <code>mercury</code> (version control)</li>
+<li>Default environment: Unix, running on a x86 machine.</li>
+</ul>
+<blockquote>
+<p>A good reference: <a href="http://web.stanford.edu/~adyuen/107">Allison's CS107 Survival Guide</a>, updated March 2015.</p>
+</blockquote>
+<blockquote>
+<p>Learn your <code>gdb</code>! It'll be your friends in later assignments. That being said, another powerful debugging tool is <code>printf()</code> and <code>cout</code>. When you are printing debugging info, you'd better add &quot;[DEBUG]&quot; at the beginning, so they stand out and you can remove them from your code more quickly after debugging is done.</p>
+</blockquote>
+<h2 id="02-contents-in-this-course-in-a-rough-picture">0.2 Contents in this course (in a rough picture)</h2>
+<h3 id="021-filesystems">0.2.1 Filesystems</h3>
+<ul>
+<li>Linux and C libraries for file manipulation: <code>stat</code>, <code>struct</code> <code>stat</code>, <code>open</code>, <code>close</code>, <code>read</code>, <code>write</code>, <code>readdir</code>, <code>struct dirent</code>, file descriptors, regular files, directories, soft and hard links, programmatic manipulation of them, implementation of <code>ls</code>, <code>cp</code>, <code>cat</code>, etc.</li>
+<li>naming, abstraction and layering concepts in systems as a means for managing complexity, blocks, <code>inode</code>s, <code>inode</code> pointer structure, <code>inode</code> as abstraction over blocks, direct blocks, indirect blocks, doubly indirect blocks, design and implementation of a file system.</li>
+<li>additional systems examples that rely on naming, abstraction, modularity, and layering, including DNS, TCP/IP, network packets, databases, HTTP, REST, descriptors and <code>pid</code>s.</li>
+<li>building modular systems with simultaneous goals of simplicity of implementation, fault tolerance, and flexibility of interactions.</li>
+<li>basic understanding to system calls.</li>
+</ul>
+<h3 id="022-multiprocessing">0.2.2 Multiprocessing</h3>
+<ul>
+<li>introduction to multiprocessing, <code>fork</code>, <code>waitpid</code>, <code>execvp</code>, process ids, inter-process communication, context switches, user versus supervisor mode.</li>
+<li>protected address spaces, virtual memory, main memory as cache, virtual to physical address mapping.</li>
+<li>concurrency versus parallelism, multiple cores versus multiple processors, concurrency issues with multiprocessing.</li>
+<li>interrupts, faults, systems calls, signals, design and implementation of a simple shell.</li>
+<li>virtualization as a general systems principle, with a discussion of processes, RAID, load balancers, AFS servers and clients.</li>
+</ul>
+<h3 id="023-threading-and-concurrency">0.2.3 Threading and Concurrency</h3>
+<ul>
+<li>sequential programming, VLIW concept, desire to emulate the real world with parallel threads, free-of-charge exploitation of multiple cores (two per <code>myth</code> machine, eight per <code>corn</code> machine, 24 per <code>barley</code> machine), pros and cons of <code>thread</code>ing versus <code>fork</code>ing.</li>
+<li>C++ <code>thread</code>s, <code>thread</code> construction using function pointers, blocks, functors, <code>join</code>, <code>detach</code>, race conditions, <code>mutex</code>, IA32 implementation of <code>lock</code> and <code>unlock</code>, spin-lock, busy waiting, preemptive versus cooperative multithreading, <code>yield</code>, <code>sleep_for</code>.</li>
+<li>condition variables, rendezvous and thread communication, <code>unique_lock</code>, <code>wait</code>, <code>notify_one</code>, <code>notify_all</code>, deadlock.</li>
+<li>semaphore concept and <code>classs emaphore</code> implementation, generalized counter, pros and cons of <code>semaphore</code> versus exposed condition variables, thread pools, cost of threads versus processes.</li>
+<li>active threads, blocked threads, ready thread queue, high-level implementation details of the thread manager, <code>mutex</code>, and <code>condition_variable_any</code>.</li>
+<li>pure C alternatives via <code>pthread</code>s, pros of <code>pthread</code>s over C++11 thread package.</li>
+</ul>
+<h3 id="024-networking-and-distributed-computing">0.2.4 Networking and Distributed Computing</h3>
+<ul>
+<li>client-server model, peer to peer model, protocol as contract and permitted conversation, request and response as a way to organize modules and their interactions to support a clear set of responsibilities.</li>
+<li>stateless versus keep-alive connections, latency and throughput issues, <code>gethostbyname</code>, <code>gethostbyaddr</code>, IPv4 versus IPv6, <code>struct</code> <code>sockaddr</code> hierarchy of <code>struct</code>s, network-byte order.</li>
+<li>ports, socket file descriptors, <code>socket</code>, <code>connect</code>, <code>bind</code>, <code>accept</code>, <code>read</code>, <code>write</code>, simple echo server, time server, concurrency issues, spawning threads to isolate and manage single conversations.</li>
+<li>C++ layer over raw I/O file descriptors, pros and cons, introduction to <code>sockbuf</code> and <code>sockstream</code> C++ classes.</li>
+<li>HTTP 1.0 and 1.1, header fields, <code>GET</code>, <code>HEAD</code>, <code>POST</code>, complete versus chunked payloads, response codes, web caching and consistency protocols.</li>
+<li>IMAP, custom protocols, Dropbox and iCloud reliance on variations of HTTP.</li>
+<li>Non-blocking I/O, where normally slow system calls like <code>open</code>, <code>accept</code>, <code>read</code>, and <code>write</code> return immediately instead of blocking, <code>select</code>, <code>epoll_*</code> set of functions, <code>libev</code> and <code>libuv</code> open source libraries.</li>
+<li>MapReduce programming model, implementation strategies using multiple threads and/or processes, comparison to previous systems that do the same thing, but not as well.</li>
+</ul>
+<h2 id="03-the-readings">0.3 The readings</h2>
+<ul>
+<li><em>Computer Systems: A Programmer's Perspective</em> by Bryant and O'Hallaron, either the 2nd or 3rd edition.</li>
+<li><em>Principles of Computer System Design: An Introduction</em> by Jerome H. Saltzer and M. Frans Kaashoek.</li>
+</ul>
+<h2 id="04-the-assignments">0.4 The assignments</h2>
+<ul>
+<li>All programming assignments are due at the stroke of midnight, and you'll always be given at least 7 days to complete any one of them.</li>
+<li>If you need to submit an assignment after the deadline, you still can.  But doing so places a cap on the maximum number of points you can get for that assignment, depending on how late you submit.</li>
+<li>The first assignment must be turned in by the published deadline, without exception.
+<ol>
+<li>Filesystem - Six degrees of Kevin Bacon</li>
+<li>Filesystem - Unix filesystems</li>
+<li>Multiprocessing - All things multiprocessing</li>
+<li>Multiprocessing - stsh - Stanford shell</li>
+<li>Multithreading - News aggregation</li>
+<li>Multithreading - News aggregation take II (thread pool)</li>
+<li>Networking - HTTP web proxy and cache</li>
+<li>Networking - MapReduce</li>
+</ol>
+</li>
+</ul>
+<h2 id="05-the-exams">0.5 The exams</h2>
+<h3 id="051-the-midterm">0.5.1 The midterm:</h3>
+<ul>
+<li>Time: 13:30 – 14:50 (lecture time), 80 min., on <strong>Friday, May 12</strong>, 2017</li>
+<li>Venue: CEMEX Auditorium</li>
+<li>Content: the first 9 lectures of the course (everything up to and including our discussion of virtual memory and the OS scheduler on April 28, but no threading or related concurrency issues).</li>
+<li><strong>Closed book, closed note, closed electronic device</strong>, but one double-sided 8.5&quot;-by-11&quot; cheat sheet is allowed.</li>
+</ul>
+<h3 id="052-the-final">0.5.2 The final</h3>
+<ul>
+<li>Time: 15:30 – 18:30, 180 min., on <strong>Monday, June 12</strong>, 2017</li>
+<li>Venue: NVIDIA Auditorium or Gates B03</li>
+<li>Content: all lectures.</li>
+<li><strong>Closed book, closed note, closed electronic device</strong>, but two double-sided 8.5&quot;-by-11&quot; cheat sheets are allowed.</li>
+</ul>
+<h2 id="06-some-suggestions-on-convenient-commands">0.6 Some suggestions on convenient commands</h2>
+<p>We will rely on Stanford's <code>myth</code> cluster for labs and assignments (You can configure your &quot;<a href="https://uit.stanford.edu/service/openafs">OpenAFS for Stanford</a>&quot; account for further convenience).</p>
+<ul>
+<li>
+<p>In the <code>~/.bashrc</code> file (or <code>~/.zshrc</code>, depending on your shell) on your local machine, add this line:</p>
+<pre class="hljs"><code><div>alias myth='ssh [YOUR_SUNetID]@myth.stanford.edu'
+</div></code></pre>
+<p>And then use the command <code>source ~/.bashrc</code> in the local shell (or <code>source ~/.zshrc</code>, etc.) to make it effective.</p>
+</li>
+<li>
+<p>In the <code>~/.bashrc</code> file on your <code>myth</code> machine, add the following lines:</p>
+<pre class="hljs"><code><div>alias ll='ls -l'
+alias sanitycheck='/usr/class/cs110/tools/sanitycheck'
+alias submit='hg commit -m &quot;submit&quot;; /usr/class/cs110/tools/submit'
+</div></code></pre>
+<p>And then use the command <code>source ~/.bashrc</code> in the <code>myth</code>'s shell to make them effective.</p>
+</li>
+</ul>
+<p>These aliases will save you a lot of time, especially if your are scrambling to submit your assignment in the last minute!</p>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

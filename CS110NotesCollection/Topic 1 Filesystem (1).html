@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Filesys (1)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-1-filesystem-1">Topic 1 Filesystem (1)</h1>
+<div id="author-signature">Leedehai</div>
+Wednesday, April 05, 2017<br>
+Friday, April 07, 2017
+<blockquote>
+<p>A <em>filesystem</em> is used to <strong>control how data is stored and retrieved</strong>. Without a file system, information placed in a storage medium would be one large body of data with no way to tell where one piece of information stops and the next begins. By separating the data into pieces and giving each piece a name, the <strong>data is segmented and identified</strong>. Some file systems are used on <strong>local storage devices</strong>; others provide file access via a <strong>network protocol</strong>. Implementations of a filesystem vary, such as ext3, ext4, FAT, NTFS, HFS, APFS, AFS, NFS..</p>
+</blockquote>
+<h2 id="11-an-appetizer-cp">1.1 An appetizer: <code>cp</code></h2>
+<p>Let us dive into the terminal land. As we all know, the command <code>cp</code> is a directive that replicates files. The resulting file is such a good replica that <code>diff</code> yields no difference between the resulting file and the original one.</p>
+<pre class="hljs"><code><div>cp makefile makefile.copy
+</div></code></pre>
+<p>Users tend to treat directives like <code>cp</code> as magic directives which are intrinsic to the terminal. What is little known to the the general users is that many of them are actually C/C++ programs, the only difference being the executables reside in somewhere else (on Unix, <code>cp</code>'s executable typically resides in <code>/bin</code>). It is the same case for directives like <code>ls</code>, <code>mv</code>, <code>find</code>, <code>clear</code>, even shell built-ins like <code>cd</code> and <code>which</code>, and many others that can sit at the <code>argv[0]</code> position of a command line.</p>
+<blockquote>
+<p>SIDE NOTE:<br>
+Command-line: suppose a directive needs <code>n</code> trailing input arguments:<br> <code>executable_name input_arg_1 ... input_arg_n</code></p>
+<pre class="hljs"><code><div>argc = n + 1 (it includes the directive's name!)
+argv:
+   ┌─────────┬─────────┬───────┬─────────┬────────┐
+   │ argv[0] │ argv[1] │  ...  │ argv[n] │  NULL  │
+   └─────────┴─────────┴───────┴─────────┴────────┘
+        │         │                 │ 
+        ▼         │                 │
+&quot;executable_name&quot; ▼                 ▼ 
+            &quot;input_arg_1&quot; ...  &quot;input_arg_n&quot;            
+</div></code></pre>
+<p><code>argv</code> array contains <code>n + 2</code> pointers of type <code>const char *</code> (including the pointer to the executable's name string and the trailing <code>NULL</code> pointer).</p>
+</blockquote>
+<h3 id="111-implementing-copyc">1.1.1 Implementing <code>copy.c</code></h3>
+<p><code>copy.c</code> is our reimplementation of <code>cp</code>, which</p>
+<ul>
+<li>serves as an example of implementing shell commands,</li>
+<li>introduces the notion of <em>file descriptor</em>s,</li>
+<li>utilizes low-level <em>system call</em>s <code>open</code>, <code>read</code>, <code>write</code>, and <code>close</code>. On <a href="https://en.wikipedia.org/wiki/POSIX">POSIX</a> systems and in C programming language, they are mostly accessible through head file <code>unistd.h</code>. A system call is a functions that <strong>requests a service from the kernel</strong> of the operating system, and it is implemented by the operating system, instead of by the an application or a programming language library.</li>
+</ul>
+<blockquote>
+<p>A good document that lists all system calls specified by POSIX: <a href="http://www.tutorialspoint.com/unix_system_calls/index.htm">POSIX system calls</a>.</p>
+</blockquote>
+<p>We are not going to use <code>FILE *</code> (in C) or <code>ifstream</code>/<code>ofstream</code> (in C++)...</p>
+<ul>
+<li><code>FILE *</code> and <code>ifstream</code>/<code>ofstream</code> are the standard file input/output interface in C and C++, respectively, but they are actually wrappers of low-level <em>system call</em>s.</li>
+<li>we are going to use <em>file descriptor</em>s, as file identification in low-level system calls.</li>
+<li>
+<blockquote>
+<p>SIDE NOTE:<br> &quot;openning&quot; a file - <br>
+C prototype: <code>FILE *fopen(const char *filename, const char *mode)</code> <br>
+C++ prototype : <code>void ifstream::open(const char* filename, ios_base::openmode mode = ios_base::in)</code></p>
+</blockquote>
+</li>
+</ul>
+<h3 id="112-pseudocode-kob">1.1.2 Pseudocode (KOB):</h3>
+<pre class="hljs"><code><div>PROCEDURE copy(source_file_name, destination_file_name):
+    open the source file;
+    create the destination file;
+    create a data buffer of n bytes;
+    LOOP:
+        read at most n bytes from the source file to the buffer;
+        IF n == 0:
+            BREAK;
+        M = 0;
+        DO WHILE M &lt; n:
+            write m bytes from the buffer to the destinaton file;
+            M += m;
+        END
+    END
+    close the source file;
+    close the destination file;
+END PROCEDURE
+</div></code></pre>
+<h3 id="113-inplementation">1.1.3 Inplementation:</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* copy.c */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;fcntl.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt; // POSIX system calls</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;errno.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/stat.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/stat.h&gt;</span></span>
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kWrongArgumentCount = <span class="hljs-number">1</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kSourceFileNonExistent = <span class="hljs-number">2</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kDestinationFileOpenFailure = <span class="hljs-number">4</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kReadFailure = <span class="hljs-number">8</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kWriteFailure = <span class="hljs-number">16</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kDefaultPermissions = <span class="hljs-number">0644</span>; <span class="hljs-comment">// "rw-r--r--"</span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-keyword">if</span> (argc != <span class="hljs-number">3</span>) {
+    <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"%s &lt;source-file&gt; &lt;destination-file&gt;.\n"</span>, argv[<span class="hljs-number">0</span>]);
+    <span class="hljs-keyword">return</span> kWrongArgumentCount;
+  }
+  
+  <span class="hljs-keyword">int</span> fdin = open(argv[<span class="hljs-number">1</span>], O_RDONLY);
+  <span class="hljs-keyword">if</span> (fdin == <span class="hljs-number">-1</span>) {
+    <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"%s: source file could not be opened.\n"</span>, argv[<span class="hljs-number">1</span>]);
+    <span class="hljs-keyword">return</span> kSourceFileNonExistent;
+  }
+  
+  <span class="hljs-keyword">int</span> fdout = open(argv[<span class="hljs-number">2</span>], O_WRONLY | O_CREAT | O_EXCL, kDefaultPermissions);
+  <span class="hljs-keyword">if</span> (fdout == <span class="hljs-number">-1</span>) {
+    <span class="hljs-keyword">switch</span> (errno) {
+    <span class="hljs-keyword">case</span> EEXIST:
+      <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"%s: destination file already exists.\n"</span>, argv[<span class="hljs-number">2</span>]);
+      <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">default</span>:
+      <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"%s: destination file could not be created.\n"</span>, argv[<span class="hljs-number">2</span>]);
+      <span class="hljs-keyword">break</span>;
+    }
+    <span class="hljs-keyword">return</span> kDestinationFileOpenFailure;
+  }
+
+  <span class="hljs-keyword">char</span> buffer[<span class="hljs-number">1024</span>];
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-keyword">ssize_t</span> bytesRead = read(fdin, buffer, <span class="hljs-keyword">sizeof</span>(buffer));
+    <span class="hljs-keyword">if</span> (bytesRead == <span class="hljs-number">0</span>) <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">if</span> (bytesRead == <span class="hljs-number">-1</span>) {
+      <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"%s: lost access to file while reading.\n"</span>, argv[<span class="hljs-number">1</span>]);
+      <span class="hljs-keyword">return</span> kReadFailure;
+    }
+
+    <span class="hljs-keyword">size_t</span> bytesWritten = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">while</span> (bytesWritten &lt; bytesRead) {
+      <span class="hljs-keyword">ssize_t</span> count = write(fdout, buffer + bytesWritten, bytesRead - bytesWritten);
+      <span class="hljs-keyword">if</span> (count == <span class="hljs-number">-1</span>) {
+	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"%s: lost access to file while writing.\n"</span>, argv[<span class="hljs-number">2</span>]);
+	<span class="hljs-keyword">return</span> kWriteFailure;
+      }
+      bytesWritten += count;
+    }
+  }
+
+  <span class="hljs-keyword">if</span> (close(fdin) == <span class="hljs-number">-1</span>) <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"%s: had trouble closing file.\n"</span>, argv[<span class="hljs-number">1</span>]);
+  <span class="hljs-keyword">if</span> (close(fdout) == <span class="hljs-number">-1</span>) <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"%s: had trouble closing file.\n"</span>, argv[<span class="hljs-number">2</span>]);
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<h3 id="114-the-code-explained">1.1.4 The code explained</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">int</span> fdin = open(argv[<span class="hljs-number">1</span>], O_RDONLY);
+</div></code></pre>
+<p>The system call <code>open()</code> takes as input the file name and the mode. The mode is an &quot;oflag&quot; (open flag) - here the oflag <code>O_RDONLY</code> means &quot;open for reading only&quot;. This function does not return a pointer to the file, but a <strong>non-negative integer</strong> referred to as <em>file descriptor</em> (if you have played around with Matlab, you may have seen this). If the call fails, it returns <code>-1</code> in stead.</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">int</span> fdout = open(argv[<span class="hljs-number">2</span>], O_WRONLY | O_CREAT | O_EXCL, kDefaultPermissions);
+</div></code></pre>
+<p>Similarly, here we bring in the destination file. The file is also represented by a file descriptor, which is a non-negative integer. If the call fails, it returns <code>-1</code>. Since the mode (oflag) constants are perfect power of 2, multiple mode constants can be organized by bitwise-OR operations to combine their effects. Here,</p>
+<ul>
+<li><code>O_WRONLY</code> stands for &quot;open for writing only&quot;,</li>
+<li><code>O_CREAT</code> stands for &quot;if the file doesn't exist, create the file&quot; (note the final &quot;e&quot; is missing from the word &quot;create&quot;),</li>
+<li><code>O_EXCL</code> means &quot;if the file arealy exist, open( ) will fail&quot; (&quot;exculsively&quot;).</li>
+</ul>
+<p>Finally, the third argument is the file permission (an octal number <code>0644</code> here).</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">ssize_t</span> bytesRead = read(fdin, buffer, <span class="hljs-keyword">sizeof</span>(buffer));
+</div></code></pre>
+<p>Here we read <strong>at most</strong> <code>sizeof(buffer)</code> bytes from the source file (denoted by the file descriptor <code>fdin</code>) to a buffer pointed to by the pointer <code>buffer</code>. The system call <code>read</code> returns the actual number of bytes it reads in. If it reaches the end of the current file block (not neccessarily the end of file, as the hard drive may have to spin to another segment), it will return a number smaller than the specified number of bytes, even <code>0</code>. If it fails, it returns <code>-1</code>.</p>
+<p>Note that the return type is <code>ssize_t</code>, which stands for &quot;signed size type&quot;, usually implemented as an <code>int</code> type.</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">ssize_t</span> count = write(fdout, buffer + bytesWritten, bytesRead - bytesWritten);
+</div></code></pre>
+<p>Here we write <strong>at most</strong> <code>bytesRead - bytesWritten</code> bytes, starting from the memory address <code>buffer + bytesWritten</code>, to the destination file (denoted by the file descriptor <code>fdout</code>). The call returns the actual number of bytes it writes to the file, which may be less than the specified number of bytes (e.g. the hard drive may have to spin), and returns <code>-1</code> if the writing operation fail.</p>
+<pre class="hljs"><code><div>close(fdin);
+close(fdout);
+</div></code></pre>
+<p><code>close()</code> is also a system call. Once the sesison is completed, you need to close the files. In this process, resources associated with the file is de-allocated, as a part of the de-allocation process, the association between the file descriptor (an integer) and the file is broken up.</p>
+<p>If closing the file succeeds, it returns <code>0</code>; otherwise it returns <code>-1</code> and a variable maintained by the system <code>errno</code> is properly set to denote the reason of failure.</p>
+<h3 id="115-a-brief-summary-of-the-four-system-calls-kob">1.1.5 A brief summary of the four system calls (KOB)</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* open */</span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">open</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *filename, <span class="hljs-keyword">int</span> oflag, ...)</span></span>; <span class="hljs-comment">// </span>
+  <span class="hljs-comment">/**
+   * "..." stands for variadic function, since open() may take in 
+   * more than two arguments (e.g. file access permission)
+   * oflag: O_RDONLY, O_WRONLY, O_CREAT, O_EXCL, ...
+   * oflags are perfect power of 2.
+   */</span>
+<span class="hljs-comment">/* read */</span>
+<span class="hljs-keyword">ssize_t</span> read(<span class="hljs-keyword">int</span> fd, <span class="hljs-keyword">void</span> *start, <span class="hljs-keyword">size_t</span> nbyte);
+<span class="hljs-comment">/* write */</span>
+<span class="hljs-keyword">ssize_t</span> write(<span class="hljs-keyword">int</span> fd, <span class="hljs-keyword">void</span> *start, <span class="hljs-keyword">size_t</span> nbyte);
+<span class="hljs-comment">/* close */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">close</span><span class="hljs-params">(<span class="hljs-keyword">int</span> fd)</span></span>;
+</div></code></pre>
+<h2 id="12-file-descriptors-and-the-three-tables-kob">1.2 File descriptors and &quot;the three tables&quot; (KOB)</h2>
+<p>Let's look at what happens behind the scene when you acess a file.</p>
+<ul>
+<li>To &quot;open&quot; a file, i.e. grant your current user process the access to a file, you need to (directly or indirectly) call the system call <code>open()</code> and pass to it information like file name and access mode. The OS kernel will search the disk for the file. If successful, the kernel grant the user process the access to the file and returns a non-negative integer, namely a file descriptor, to the user process.</li>
+<li>To perform file I/O, your process passes the file descriptor (a non-negative integer) to the OS kernel through a system call, and the kernel will access the file on behalf of the process. The process does not have direct access to the file or inode tables.</li>
+</ul>
+<p>What does &quot;the kernel grant the user process the access&quot; mean? Answer: it means that</p>
+<ul>
+<li>once the kernel finds the specified file's metadata (stored in a data structure called <em>inode</em>, to be decribed later) on the disk, it will cache the metadata to a table maintained by the kernel <strong>system-wide</strong>, called <em>vnode table</em>, in memory.</li>
+<li>then, an entry in another table called <em>file entry table</em>, also maintained by the kernel <strong>system-wide</strong> in memory, points to this <em>vnode</em> entry. This <em>file table</em> entry also documents the file's access permission, the cursor offset (i.e. the byte position where the next read/write operation starts, originally at 0), the reference count (i.e. how many file descriptors points to this file entry), etc.</li>
+<li>lastly, an entry in the <em>descriptor table</em>, maintained by the kernel <strong>per-process</strong> in memory, is allocated and points to the file entry in the file entry table.</li>
+<li>The file descriptor table's first three entries, denoted by file descriptor <code>0</code>, <code>1</code>, and <code>2</code>, are reserved for a process's <code>stdin</code>, <code>stdout</code>, and <code>stderr</code> streams, respectively. This abstraction makes standard I/O appears to be a file I/O to processes. <code>stdin</code>, <code>stdout</code>, and <code>stderr</code> normally point to the console, but can be redirected to other files.</li>
+<li>when a user process wants to access the file, the kernel will travel through the three tables (the process's descriptor table - the kernel's file entry table - the kernel's vnode table - the file's inode on disk - the disk), fetch the data, and return to the user process.</li>
+<li>the &quot;v&quot; in &quot;vnode&quot; stands for &quot;virtual&quot;, as in &quot;virtual file system&quot;.</li>
+</ul>
+<pre class="hljs"><code><div>           ┌──────────────┐┌──────────────┐┌──────────────┐         
+           │ process 1201 ││ process 1705 ││ process 1707 │      
+           ├──────────────┤├──────────────┤├──────────────┤       
+           │        ┌───┐ ││              ││              │     
+processes  │int fd1 │ 3 │ ││       ┌───┐  ││       ┌───┐  │                     
+           │        ├───┤ ││int fd │ 3 │  ││int fd │ 3 │  │                       
+           │int fd2 │ 4 │ ││       └───┘  ││       └───┘  │                         
+           │        └───┘ ││              ││              │    
+           └──────────────┘└──────────────┘└──────────────┘
+                                               USER SPACE (in memory)
+ ───────────────────────────────────────────────────────────────────────
+file descriptor table(s)                       KERNEL SPACE (in memory)
+   pid 1201                  pid 1705               pid 1707            
+  ┌───┬───┬───┬───┬───┬───┐ ┌───┬───┬───┬───┬───┐  ┌───┬───┬───┬───┬───┐   
+  │   │   │   │   │   │   │ │   │   │   │   │   │  │   │   │   │   │   │   
+  └───┴───┴───┴───┴───┴───┘ └───┴───┴───┴───┴───┘  └───┴───┴───┴───┴───┘       
+   0   1   2   3│  4│  ..    0   1   2   3│  ..     0   1   2   3│  ..     
+                │   └──────────────────┐  │                      │           
+file entry      │                      │  │                      │
+  table         ▼                      ▼  ▼                      ▼         
+ ┌───────────────────┬───┬───────────────────┬───┬───────────────────┐      
+ │mode: r--r--r--    │   │mode: -w-------    │   │mode: rw-------    │    
+ │cursor offset: 0   │   │cursor offset: 0   │   │cursor offset: 0   │    
+ │reference count: 1 │...│reference count: 2 │...│reference count: 1 │    
+ │          ┌──────┐ │   │          ┌──────┐ │   │          ┌──────┐ │    
+ │vnode ptr │      │ │   │vnode ptr │      │ │   │vnode ptr │      │ │    
+ │          └───┬──┘ │   │          └──┬───┘ │   │          └───┬──┘ │    
+ └──────────────┼────┴───┴─────────────┼─────┴───┴──────────────┼────┘    
+                │                      └────────────────┐       │             
+vnode table     ▼                                       ▼       ▼             
+  ┌────────────────────┬────────────────────────┬────────────────────┐       
+  │type: direcotry file│                        │ type: regular file │       
+  │ reference count: 1 │          ...           │ reference count: 2 │       
+  │    inode: 2702     │                        │    inode: 3301     │       
+  └────────────────────┴────────────────────────┴────────────────────┘
+  ────────────────────────────────────────────────────────────────────
+                                                                DISK
+  ┌────┬─────────────┬─────────────────────────────────────────────┐
+  │ .. │ inode table |             ...payload data...              │
+  └────┴─────────────┴─────────────────────────────────────────────┘
+</div></code></pre>
+<h2 id="13-another-example-find">1.3 Another example: <code>find</code></h2>
+<p>The shell built-in <code>find</code> is a powerful tool to look for a file. A typical usage of if is</p>
+<pre class="hljs"><code><div>$ find /Library/C++_includes -name stdio.h -print
+/Library/C++_includes/standard_include/c++/4.2.1/tr1/stdio.h
+/Library/C++_includes/standard_include/stdio.h
+/Library/C++_includes/standard_include/sys/stdio.h
+</div></code></pre>
+<p>Now we are going to implement a simpler version of this, called <code>search</code>. Its usage is</p>
+<pre class="hljs"><code><div>$ search /Library/C++_includes stdio.h
+/Library/C++_includes/standard_include/c++/4.2.1/tr1/stdio.h
+/Library/C++_includes/standard_include/stdio.h
+/Library/C++_includes/standard_include/sys/stdio.h
+</div></code></pre>
+<h3 id="131-pseudocode">1.3.1 Pseudocode</h3>
+<p>Gist of algorithm: recursively search each subdirectory inside the target directory. Depth-first search (DFS).</p>
+<pre class="hljs"><code><div>// recursion
+SUBPROCEDURE listMatches(string path, int length, string pattern);
+  path += &quot;/&quot;; // extend the string &quot;path&quot;
+  length++;
+  dir = open_directory(path);
+  LOOP:
+    entry = read_directory_entry(dir);
+    IF entry.name == &quot;.&quot; OR entry.name == &quot;..&quot;:
+      CONTINUE;
+    END
+    path += entry.name; // extend string &quot;path&quot; with this file name
+    
+    st = get_file_stat(path); // get the file's status info
+    IF st IS directory file: // DFS
+      listMatches(path, length + string_length(entry.name), pattern);
+    ELSE IF st IS regular file:
+      IF entry.name == pattern:
+        PRINT(path) // print the whole path of this file
+      END
+    END 
+  END
+END SUBPROCEDURE
+
+// main: starting point
+PROCEDURE search(string target_directory, string pattern):
+  st = get_file_stat(target_directory); // get the file's status info
+  IF st is NOT a directory:
+    RETURN;
+  END
+
+  path = target_directory;
+  length = string_length(path);
+  listMatches(path, length, pattern); // the recursion call
+END PROCEDURE
+</div></code></pre>
+<h3 id="132-implementation">1.3.2 Implementation</h3>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;   // bool</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stddef.h&gt;    // size_t</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdarg.h&gt;    // va_list, etc.</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/stat.h&gt;  // stat</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;    // strlen, strcpy, strcmp</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;dirent.h&gt;    // DIR, struct dirent</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">listMatches</span><span class="hljs-params">(<span class="hljs-keyword">char</span> path[], uint length, <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *pattern)</span> </span>{
+  <span class="hljs-comment">/* extend the path: char *dest = strcpy(char *dest, const char *src) */</span>
+  <span class="hljs-built_in">strcpy</span>(path + length, <span class="hljs-string">"/"</span>);
+  length++;
+
+  DIR *dir = diropen(path);
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-keyword">struct</span> dirent *de = readdir(dir);
+    <span class="hljs-keyword">if</span> (de == <span class="hljs-literal">NULL</span>)
+      <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(de-&gt;d_name, <span class="hljs-string">"."</span>) == <span class="hljs-number">0</span> || <span class="hljs-built_in">strcmp</span>(de-&gt;d_name, <span class="hljs-string">".."</span>) == <span class="hljs-number">0</span>)
+      <span class="hljs-keyword">continue</span>;
+
+    <span class="hljs-built_in">strcpy</span>(path + length, de-&gt;d_name); <span class="hljs-comment">/* extend the path string */</span>
+    <span class="hljs-keyword">struct</span> stat st;
+    lstat(path, &amp;st);
+
+    <span class="hljs-keyword">if</span>(S_ISDIR(st.st_mode)) {
+      listMatches(path, length + <span class="hljs-built_in">strlen</span>(de-&gt;d_name), pattern); <span class="hljs-comment">/* DFS */</span>
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (S_ISREG(st.st_mode)) {
+      <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(de-&gt;d_name, pattern) == <span class="hljs-number">0</span>) {
+        <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%s\n"</span>, path);
+      }
+    }
+  }
+  dirclose(dir);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  assert(argc == <span class="hljs-number">3</span>);
+
+  <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *targetDirectory = argv[<span class="hljs-number">1</span>];
+  <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *pattern = argv[<span class="hljs-number">2</span>];
+
+  <span class="hljs-keyword">struct</span> stat st;
+  lstat(targetDirectory, &amp;st);
+  assert(S_ISDIR(st.st_mode));
+
+  <span class="hljs-keyword">char</span> path[kMaxPathLength];
+  <span class="hljs-built_in">strcpy</span>(path, targetDirectory);
+  <span class="hljs-keyword">size_t</span> length = <span class="hljs-built_in">strlen</span>(path);
+
+  listMatches(path, length, pattern);
+
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<h3 id="133-the-code-explained">1.3.3 The code explained</h3>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/stat.h&gt;  // stat</span></span>
+</div></code></pre>
+<p>The system call <code>lstat</code> is a C <code>struct</code> type that stores a file's status info, including the file's inode number, mode, owner ID, group ID, modification time, etc.</p>
+<p>As a basic implementation, <code>int stat(const char *path, struct stat *buf);</code> stats the file pointed to by <code>path</code> and fills in the buffer pointed to by <code>buf</code>, and returns <code>0</code> on success, <code>-1</code> on failure. <code>lstat()</code> is identical to <code>stat()</code>, except that if <code>path</code> is a symbolic link, then the status info of the link itself is extracted, not the file the link refers to, hence the name &quot;link-sensitive stat&quot;.</p>
+<pre class="hljs"><code><div>DIR *dir = diropen(path);
+</div></code></pre>
+<p><code>diropen</code> takes as input the path name (<code>char *</code>), and returns a pointer of type <code>DIR *</code>, which points to a structure representing a directory stream. The returned pointer serves as a handler for that directory, similar to <code>FILE *</code>.</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">struct</span> dirent *de = readdir(dir);
+</div></code></pre>
+<p>The function <code>struct dirent *readdir(DIR *dirp)</code> returns a pointer to a structure representing a directory entry at the current cursor position in the directory stream specified by <code>dir</code>, and position the stream at the next entry. It shall return a <code>NULL</code> pointer upon reaching the end of the directory stream. On failure, it returns a <code>NULL</code> pointer and properly sets <code>errno</code> to indicate the reason.</p>
+<pre class="hljs"><code><div>assert(argc == <span class="hljs-number">3</span>);
+</div></code></pre>
+<p>If the expression in the parenthesis pair evaluates to <code>TRUE</code>, <code>assert()</code> does nothing. Otherwise, it displays an error message on <code>stderr</code> and aborts program. It is not part of POSIX, but a genuine C library function.</p>
+<pre class="hljs"><code><div>S_ISDIR(st.st_mode);
+S_ISREG(st.st_mode);
+</div></code></pre>
+<p>To check if the file, whose status info is stored in <code>st</code> of <code>stat</code> type, is a directory file or a regular file. They take in the <code>mode</code> member of <code>stat</code> structure and return a boolean. A similar POSIX macro is <code>S_ISLNK()</code> (to check if it is a symbolic link). The first &quot;S&quot; stands for &quot;status&quot;.</p>
+<blockquote>
+<p>SIDE NOTE:<br>
+In the output of shell command <code>ls -l</code>, the leftmost column indicates a file's type and access permission, as in <code>drwxr-xr--</code>. If the file is a regular file, the first character is <code>-</code>; a directory file, <code>d</code>; a symbolic link file, <code>l</code>.</p>
+</blockquote>
+<blockquote>
+<p>SIDE NOTE:<br>
+A <em>symbolic link</em> (also <em>symlink</em> or <em>soft link</em>) is the nickname for a file. This symbolic link file contains a reference to another file or directory in the form of an absolute or relative path and that affects pathname resolution.<br> Symbolic links <strong>operate transparently</strong> for many operations: programs that read or write to files named by a symbolic link will behave as if operating directly on the target file. However, they have the side effect of changing an otherwise hierarchical filesystem from a tree into a <strong>directed graph</strong>, which can have consequences.<br> It is different from a <a href="https://en.wikipedia.org/wiki/Hard_link"><em>hard link</em></a>.</p>
+</blockquote>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

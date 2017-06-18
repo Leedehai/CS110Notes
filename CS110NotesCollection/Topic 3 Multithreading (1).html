@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Multithrd (1)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-3-multithreading-1">Topic 3 Multithreading (1)</h1>
+<div id="author-signature">Leedehai</div>
+Friday, April 28, 2017<br>Monday, May 1, 2017
+<blockquote>
+<p>A <em>thread</em> of execution is the smallest sequence of instructions that can be managed by a scheduler. <br><strong>A thread is a component of a process</strong>, a recipe of independent execution. <br>Multiple threads can exist within one process, being <strong>executed concurrently</strong> and <strong>sharing the process's resources</strong> such as memory space, executable code, variables, etc. while different processes do not share them.<br> There are a lot of ideas in multiprocessing which lend themselves to <em>multithreading</em>, another form of <em>concurrency programming</em>, where multiple logical control flow overlap or interleave in time.</p>
+</blockquote>
+<h2 id="31-overview">3.1 Overview</h2>
+<ul>
+<li>A program does not have to rely on multiprocessing to run multiple functions at the same time. As an alternative, it can create multiple threads with one process.
+<blockquote>
+<p>Examples: (1) an online music application may choose to download multiple songs simultaneously, (2) a web browser may choose to load multiple web pages simultaneously using multiple threads.</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="311-a-naive-example">3.1.1 A naïve example</h3>
+<p>In psychology, <a href="https://en.wikipedia.org/wiki/Extraversion_and_introversion">introversion</a> is the state of being predominantly interested in one's own mental self. Introverts are typically perceived as more reserved or reflective, but mistaking introversion for shyness is a common error. They can recharge themselves by spending time alone.</p>
+<blockquote>
+<p>Introverts prefer solitary to social activities, but do not necessarily fear social encounters.</p>
+</blockquote>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;pthread.h&gt;</span></span>
+
+<span class="hljs-comment">/* thread routine: notice the return type and arugument type */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> *<span class="hljs-title">recharge</span><span class="hljs-params">(<span class="hljs-keyword">void</span> *unused)</span> </span>{
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"I recharge by spending time alone.\n"</span>);
+    sleep(<span class="hljs-number">1</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>; <span class="hljs-comment">/* to statisfy the prototype */</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-keyword">pthread_t</span> introverts[<span class="hljs-number">6</span>];
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">6</span>; i++)
+    <span class="hljs-comment">/* create 6 independent threads */</span>
+    <span class="hljs-comment">/* All args are pointers */</span>
+    pthread_create(&amp;introverts[i], <span class="hljs-literal">NULL</span>, recharge, <span class="hljs-literal">NULL</span>);
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">6</span>; i++)
+    <span class="hljs-comment">/* block and wait for the child thread's termination */</span>
+    <span class="hljs-comment">/* The first arg is a TID, the second is a pointer to pointer */</span>
+    pthread_join(introverts[i], <span class="hljs-literal">NULL</span>);
+  
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Everyone's recharged!\n"</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+<span class="hljs-comment">/* takes ~1 sec to run due to multithreading, as opposed to ~6 sec */</span>
+</div></code></pre>
+<h4 id="3111-explanations">3.1.1.1 Explanations</h4>
+<ul>
+<li>
+<p><code>pthread_t</code> is essentially an integer - the thread's ID (TID). Similar to <code>pid_t</code>.</p>
+</li>
+<li>
+<p>The thread routine is a function that <strong>takes in a</strong> <code>void *</code> <strong>and returns a</strong> <code>void *</code>. In fact, you can pass in a pointer to structure or return a pointer to structure, utilizing pointer's type casting.</p>
+</li>
+<li>
+<p><code>pthread_create()</code>'s takes in 4 arguments, all of which are pointers.</p>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">pthread_create</span><span class="hljs-params">(
+      <span class="hljs-keyword">pthread_t</span> *pTID, <span class="hljs-comment">/* TID ptr. */</span>
+      <span class="hljs-keyword">const</span> <span class="hljs-keyword">pthread_attr_t</span> *pAttr, <span class="hljs-comment">/* thread attribute ptr. */</span>
+      <span class="hljs-keyword">void</span> *(*pRoutine)</span> <span class="hljs-params">(<span class="hljs-keyword">void</span> *)</span>, <span class="hljs-comment">/* thread routine function ptr. */</span>
+      <span class="hljs-keyword">void</span> *pArg <span class="hljs-comment">/* argument ptr. */</span>
+    )</span>;
+</div></code></pre>
+<ul>
+<li>The first argument <code>pTID</code> points to the variable to store the TID,</li>
+<li>The second argument <code>pAttr</code> points to the structure whose contents are used at to determine attributes for the new thread, such as priority. It can be <code>NULL</code>.</li>
+<li>The third argument <code>pRoutine</code> points to the start function of the thread routine, and that function can call other functions.</li>
+<li>The fourth argument <code>pArg</code> points to the argument that is to be passed to the thread routine. It can be a structure if there are more than one actual arguments to be passed, or a <code>NULL</code> if none.</li>
+<li>It returns <code>0</code> on success; on error, it returns an error number, and the content of <code>pTID</code> is undefined.</li>
+</ul>
+</li>
+<li>
+<p>If the master thread (&quot;the mommy thread&quot;), i.e. the thread of the process itself, exists, the entire virtual memory space of the process will be de-allocated, killing every child threads it gave birth to. So we need to wait for the child threads to terminate before letting the master thread terminates:</p>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">pthread_join</span><span class="hljs-params">(<span class="hljs-keyword">pthread_t</span> TID, <span class="hljs-keyword">void</span> **ppRetval)</span></span>;
+</div></code></pre>
+<ul>
+<li>
+<p>The first argument <code>TID</code> is the ID of the intended thread. Note that it is not a pointer.</p>
+</li>
+<li>
+<p>The second argument <code>ppRetval</code> is a pointer to the pointer to the return value of the thread.</p>
+</li>
+<li>
+<p>If the intended thread has already terminated, then <code>pthread_join()</code> returns immediately. Otherwise it <strong>blocks and waits</strong>.</p>
+</li>
+<li>
+<p>The thread specified by <code>TID</code> must be <strong>joinable</strong>, i.e. not detached.</p>
+<blockquote>
+<p>SIDE NOTE:<br>When a detached thread terminates, its resources are
+automatically de-allocated without the need for
+another thread to join with it. <code>int pthread_detach(pthread_t TID);</code> can detach a thread. A detached thread cannot be killed nor reaped by another thread, but a joinable thread can.</p>
+</blockquote>
+</li>
+<li>
+<p>On success, it returns <code>0</code>; on error, it returns an error number, among which are:</p>
+<ul>
+<li><code>EINVAL</code>: another thread is already waiting to join with this thread, or the intended child thread is not joinable.</li>
+<li><code>ESRCH</code>: no thread with that TID thread could be found.</li>
+<li><code>EDEADLK</code>: a deadlock was detected (e.g., two threads tried to join with each other), or the first argument <code>TID</code> specifies the calling thread itself.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Child threads are not obligated to start or finish together or in a predictable order - it is up to the kernel's scheduler (yes, the scheduler can manipulate threads). Once a child thread finishes, <code>pthread_join()</code> joins the child thread with the calling thread (in this example, the master thread).</p>
+</li>
+<li>
+<p>Failure to join with a thread that is joinable (i.e. undetached), produces a <em>zombie thread</em>. Avoid doing this, since zombie threads consume some system resources.</p>
+</li>
+</ul>
+<p>An illustration of creating and joining 2 child threads:</p>
+<pre class="hljs"><code><div>    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+                     start             finish       a single process
+                   ▲──●──────────────────●─ ─ ┐ 
+     master thrd.  │   cr   child thrd. 1     │   jn   
+    ───────────────┴───┬──────────────────────▼───▲─────────▶ 
+                  cr   │      child thrd. 2   jn  │     
+                       ▼──────●────────●─ ─ ─ ─ ─ ┘ 
+                            start     finish
+    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+cr: pthread_create()     jn: pthread_join()
+</div></code></pre>
+<blockquote>
+<p>SIDE NOTE:<br>ANSI C  doesn't provide native support for threads. But POSIX threads (aka pthread) comes with all standard UNIX and Linux installations of gcc, as concurrency programming requires the cooperation of the kernel.</p>
+</blockquote>
+<h4 id="3112-the-cpu-and-memory-thread-context-switch">3.1.1.2 The CPU and memory, thread context switch</h4>
+<ul>
+<li>Each process has a thread manager responsible for interleaving the execution time window within the process's execution time.</li>
+<li>Note that the threads created in the example above all belong to <strong>the same process</strong>, hence they reside in the <strong>same virtual memory space</strong>.</li>
+<li>What we are interested in is what happens in the stack and text segments in the virtual memory space.
+<ul>
+<li>
+<p>The stack segment: each thread takes a subsegment in the stack, forming their own call stacks. Inside each thread's call stack, there is a stack space reserved to store the CPU register info when that thread is swapped off from the CPU. There is no overlapping in the stack, so automatic variables cannot be inherited by child threads (unlike multiprocessing).</p>
+<blockquote>
+<p>The aforementioned space serves as the &quot;switchframe&quot; of the corresponding thread, the difference from a process's switchframe being that a thread's is stored within the stack segment of the process's virtual memory space, while a process's is stored in the kernel space.</p>
+</blockquote>
+</li>
+<li>
+<p>The text segment: the instruction pointer <code>rip</code> points to different instructions, jumping among the master's and child threads' routines.</p>
+</li>
+</ul>
+</li>
+<li>All threads share the heap, data, text, .. segments in the virtual memory space. Because of this, <strong>threads within one process can communicate with each other more easily than processes</strong>, who has to turn to pipes and signals.</li>
+</ul>
+<blockquote>
+<p>In the same process, a thread's access to another thread's <strong>objects in stack</strong> is provided by pointers/references.
+SIDE NOTE:<br><em>Preemptive multitasking</em>: the scheduler can switch the task (process/thread) out from CPU and switch another in, at any time it feels like.<br><em>Cooperative multitasking</em>: the task (process/thread) can only be switched out from CPU when it allows - say, a stage completes - and other tasks have to wait.<br>Cooperative multitasking was the primary scheduling scheme for 16-bit applications employed by Microsoft Windows before Windows 95, and by the classic Mac OS.<br>In computer network protocols, similar mechanisms is applied.</p>
+</blockquote>
+<h2 id="32-schedulers-role-in-thread-unsafety">3.2 Scheduler's role in thread (un)safety</h2>
+<ul>
+<li>When a child thread calls <code>malloc()</code>, it draws memory from the heap segment as the master thread does. Note that two threads may both decide to call <code>malloc()</code> at the same time, hence the implementation of <code>malloc()</code> is transactional, i.e. if it fails halfway, all changes made by it will be rolled back.</li>
+<li>Multiple threads may decide to print something to the console. To prevent garbled output in the console, there is an <strong>exclusive lock</strong> (typically implemented as a boolean) within the <strong>file entry</strong> instance in the system-wide file entry table, and if one thread has taken that lock, another thread cannot take it until the former thread finishes printing and release that lock on the file entry.
+<blockquote>
+<p>C's <code>printf()</code> is thread-safe; that is, it grabs the exclusive lock on the output file entry before printing and release it after it's done. However, C++'s <code>ostream::operator&lt;&lt;()</code> is NOT thread-safe.</p>
+</blockquote>
+</li>
+<li>All threads can access the global variables in the data segment. Two threads may both want to alter a global variable's value, so the implementation of the thread routine has to guard against the conflict problem caused by the <strong>unpredictability of the scheduler</strong>. This responsibility falls upon the programmer's shoulder.
+An example of the conflict problem:</li>
+</ul>
+<pre class="hljs"><code><div>scenaio 1:      ┌────────┐┌────────┐                         ──▶ time   
+                │write a:││read a, │                                   
+     thread 1   │ a = 1  ││&amp; print │                      =&gt; print 1
+                └────────┘└────────┘                                   
+                                    ┌────────┐┌────────┐
+     thread 2                       │write a:││read a, │  =&gt; print 2
+                                    │ a = 2  ││&amp; print │  
+                                    └────────┘└────────┘              OK  
+─────────────────────────────────────────────────────────────────────── 
+scenaio 2:      ┌────────┐          ┌────────┐                ERRONEOUS  
+                │write a:│          │read a, │  
+     thread 1   │ a = 1  │          │&amp; print │            =&gt; print 2
+                └────────┘          └────────┘      
+                          ┌────────┐          ┌────────┐                
+     thread 2             │write a:│          │read a, │  =&gt; print 2
+                          │ a = 2  │          │&amp; print │                
+                          └────────┘          └────────┘                
+</div></code></pre>
+<blockquote>
+<p>CS145, huh? &quot;Two actions <em>conflict</em> if they are part of different transactions, involve the same variable, and at least one of them is a write.&quot; There is a WW conflict between thread 1 &amp; 2, and in scenario 2, that conflict caused a problem. The second scenario is a bad schedule.</p>
+</blockquote>
+<h3 id="321-an-example-of-problematic-multithreading">3.2.1 An example of problematic multithreading</h3>
+<p>Suppose there are 6 extroverts and 1 tag-along introvert in an array. The extroverts need to print their greetings but the introvert needs to remain silent.</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Problematic multithreading */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *<span class="hljs-keyword">const</span> names[] = {
+  <span class="hljs-string">"Albert Chon"</span>,         <span class="hljs-string">"John Carlo Buenaflor"</span>,
+  <span class="hljs-string">"Jessica Guo"</span>,         <span class="hljs-string">"Lucas Ege"</span>,
+  <span class="hljs-string">"Sona Allahverdiyeva"</span>, <span class="hljs-string">"Yun Zhang"</span>,
+  <span class="hljs-string">"Tagalong Introvert Jerry Cain"</span>
+};
+
+<span class="hljs-function"><span class="hljs-keyword">void</span> *<span class="hljs-title">recharge</span><span class="hljs-params">(<span class="hljs-keyword">void</span> *arg)</span> </span>{
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"I'm %s. Empowered to meet you.\n"</span>, 
+           names[*(<span class="hljs-keyword">size_t</span> *)arg]); <span class="hljs-comment">/* type cast, don't forget */</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">pthread_t</span> extroverts[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">6</span>; i++) {
+        pthread_create(&amp;extroverts[i], <span class="hljs-literal">NULL</span>, recharge, &amp;i);
+    }
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">6</span>; i++) {
+        pthread_join(extroverts[i], <span class="hljs-literal">NULL</span>);
+    }
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Everyone's recharged!\n"</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>In this program, the array <code>names</code> has 7 pointers to C-strings, and the program should have print the first 6 strings one time each (though not necessarily in order). But the actual output is not deterministic: some strings get printed more than once, some strings is not printed, and sometimes the last string, which should not have been printed, gets printed:</p>
+<pre class="hljs"><code><div>$ ./confusing-extroverts
+I'm John Carlo Buenaflor.  Empowered to meet you.
+I'm Jessica Guo.  Empowered to meet you.
+I'm Sona Allahverdiyeva.  Empowered to meet you.
+I'm Sona Allahverdiyeva.  Empowered to meet you.
+I'm Yun Zhang.  Empowered to meet you.
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+Everyone's recharged!
+
+$ ./confused-extroverts 
+I'm Sona Allahverdiyeva.  Empowered to meet you.
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+Everyone's recharged!
+
+$ ./confused-extroverts 
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+I'm Tagalong Introvert Jerry Cain.  Empowered to meet you.
+Everyone's recharged!
+</div></code></pre>
+<p>The bug is:</p>
+<ul>
+<li>Note that recharge references its incoming parameter this time, and that <code>pthread_create()</code> accepts the location of the surrounding loop's index variable via its fourth argument. <code>pthread_create()</code>'s 4th argument it always passed verbatim as the single argument to the thread routine.</li>
+<li>The problem: The master thread advances <code>i</code> <strong>without regard for the fact that <code>i</code>'s address was shared with each of the child threads</strong> in its own stack frame.</li>
+<li>At first glance, it's easy to assume that <code>pthread_create()</code> captures not just the address of <code>i</code>, but the value of <code>i</code> itself. That assumption would be incorrect, as it copies the address and that's all.</li>
+<li>The address of <code>i</code> (even after it goes out of scope) is constant, but its contents <strong>evolve in parallel with the execution of the child threads</strong>. When dereferencing, <code>*(size_t *)arg</code> takes a snapshot of whatever <code>i</code> just <strong>happens to be</strong> at the time it's evaluated.</li>
+<li>This is a simple example of what's called a <em>race condition</em>.</li>
+</ul>
+<blockquote>
+<p>Q: can &quot;Albert Chon&quot; be printed more than once?<br> A: No. As the first string, &quot;Albert Chon&quot; can be printed either 0 or 1 time, but not more than that.</p>
+</blockquote>
+<blockquote>
+<p>Q: how many times can the <code>k</code>-th string (<code>k</code> = 0, 1, ..., 6) be printed?<br> A: the <code>k</code>-th string can be printed 0 ~ (<code>k</code> + 1) times.</p>
+</blockquote>
+<p>Illustration:</p>
+<pre class="hljs"><code><div>Scenario 1: OK                                   get 5
+                                         ch. 5 ○─●──────────...   t
+○ get &amp;i                                  get 4                   o
+● dereference                   ch. 4  ○──●────────────────...
+                                  get 3                           b
+                       ch. 3  ○───●────────────────────...        e
+                          get 2                   
+               ch. 2  ○───●────────────────────────...            j
+                 get 1                                            o
+      ch. 1  ○───●──────────────────────────────...               i
+        get 0                                                     n
+ch.0 ○──●─────────────────────────────────...                     e
+                                                                  d
+ ───●──────●───────●───────●───────●───────●──────●───────......─────────▶
+i = 0      1       2       3       4      5       6(break) master thread
+</div></code></pre>
+<pre class="hljs"><code><div>Scenario 2: ERRONEOUS                           get 5
+                                        ch. 5 ○─●──────────...   t
+○ get &amp;i                                 get 4                   o
+● dereference                  ch. 4  ○─●────────────────...
+                                          get 4                  b
+                      ch. 3  ○────────────●────────────...       e
+                                               get 5                   
+               ch. 2  ○────────────────────────●───────...       j
+                get 1                                            o 
+     ch. 1 ○───●──────────────────────────────...                i
+             get 1                                               n   
+ch. 0 ○──────●──────────────────────────...                      e
+                                                                 d
+ ───●───●───────────●───────●───────●──────●──────●───────......────────▶
+i = 0   1           2       3       4      5      6(break) master thread
+</div></code></pre>
+<pre class="hljs"><code><div>Scenario 3: ERRONEOUS                get 6
+                    ch. 5 ○──────────●───...                     t
+○ get &amp;i                              get 6                      o
+● dereference  ch. 4  ○───────────────●────...
+                                         get 6                   b
+           ch. 3  ○──────────────────────●────...                e
+                              get 6    
+       ch. 2  ○───────────────●──────...                         j
+                                                 get 6           o 
+   ch. 1  ○──────────────────────────────────────●──...          i
+                                  get 6                          n 
+ch. 0 ○───────────────────────────●──────...                     e
+                                                                 d
+ ───●───●───●───●───●───●───●─────────────────────......────────────────▶
+i = 0   1   2   3   4   5   6(break)                       master thread
+</div></code></pre>
+<p>To fix this, you can pass in the address to the C-strings themselves, instead of the address of the index <code>i</code>.</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Bug fixed */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *<span class="hljs-keyword">const</span> names[] = {
+  <span class="hljs-string">"Albert Chon"</span>,         <span class="hljs-string">"John Carlo Buenaflor"</span>,
+  <span class="hljs-string">"Jessica Guo"</span>,         <span class="hljs-string">"Lucas Ege"</span>,
+  <span class="hljs-string">"Sona Allahverdiyeva"</span>, <span class="hljs-string">"Yun Zhang"</span>,
+  <span class="hljs-string">"Tagalong Introvert Jerry Cain"</span>
+};
+
+<span class="hljs-function"><span class="hljs-keyword">void</span> *<span class="hljs-title">recharge</span><span class="hljs-params">(<span class="hljs-keyword">void</span> *arg)</span> </span>{
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"I'm %s. Empowered to meet you.\n"</span>, 
+           (<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *)arg); <span class="hljs-comment">/* type cast, don't forget */</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">pthread_t</span> extroverts[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">6</span>; i++) {
+        pthread_create(&amp;extroverts[i], <span class="hljs-literal">NULL</span>, recharge, (<span class="hljs-keyword">void</span> *)names[i]);
+    }
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">6</span>; i++) {
+        pthread_join(extroverts[i], <span class="hljs-literal">NULL</span>);
+    }
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Everyone's recharged!\n"</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<blockquote>
+<p>Putting <code>pthread_join()</code> in the same loop body as the <code>pthread_create()</code> also fixes this bug, but this approach essentially does not utilize the power of multithreading - it is just a sequential program in disguise.</p>
+</blockquote>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

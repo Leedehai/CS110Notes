@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Networking (4)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-4-networking-4">Topic 4 Networking (4)</h1>
+<div id="author-signature">Leedehai</div>
+Monday, June 5, 2017
+<blockquote>
+<p>There is no class meeting on Monday, May 29. The class meeting on Friday, June 2 is about system design principles, a topic that is not part of networking. See note page <em>Appendix A - Principles of Systems Design</em>.</p>
+</blockquote>
+<blockquote>
+<p>This note page touches upon the technique of <em>non-blocking I/O</em>, and uses its application in networking as an example.</p>
+</blockquote>
+<h2 id="48-non-blocking-io">4.8 Non-blocking I/O</h2>
+<h3 id="481-fast-and-slow-system-calls">4.8.1 &quot;Fast&quot; and &quot;slow&quot; system calls</h3>
+<ul>
+<li>Some system calls are thought to be <strong>fast</strong> not in that they return quickly, but in that there is no blocking time. That is, they are <strong>active on the CPU throughout their lifetime</strong>, from being initiated to being terminated.
+<ul>
+<li>Examples: <code>getpid()</code>, <code>execvp()</code>, and <code>fork()</code>. Note that the latter two system calls are generally time-consuming - rewriting or replicating a process's virtual memory space is not a cakewalk, and there are many optimizations to speed them up - they are still &quot;fast&quot; because they don't introduce blocking time.</li>
+</ul>
+</li>
+<li>Some other system calls, however, have the potential to <strong>block</strong> the calling thread or calling process. Their blocking time is undetermined - maybe milliseconds, minutes, days, or even years. Hence they fall in the category of <strong>slow</strong> system calls.
+<ul>
+<li>Examples: <code>waitpid()</code> (waits for child process's state change), <code>accept()</code> (waits for connection request), <code>read()</code> (waits for bytes).</li>
+</ul>
+</li>
+</ul>
+<h3 id="482-non-blocking-system-calls">4.8.2 Non-blocking system calls</h3>
+<ul>
+<li>&quot;Fast&quot; system calls are naturally non-blocking. But some &quot;slow&quot; system calls are capable of being non-blocking as well.</li>
+<li><code>waipid()</code>: by adding the option of <code>WNOHANG</code> to the <code>waitpid()</code> call, we let <code>waitpid()</code> to be non-blocking if there is no state change in child processes, so that the calling process can move on to do other stuff at the time which would be otherwise spent on idly waiting on the child process.</li>
+<li><code>read()</code>: by adding the option of <code>O_NONBLOCK</code> to <code>open()</code> (to create an FD), we can make <code>read()</code> calls to this file to be non-blocking. In this case, if there is no data immediately available for reading (no <code>EOF</code> either), <code>read()</code> will immediately return <code>-1</code> with <code>errno</code> being set to <code>EAGAIN</code>.</li>
+<li><code>accept()</code>: When a listening socket is marked as non-blocking, if there is no pending connection request, an <code>accept()</code> call on this socket will immediately return with <code>-1</code> with <code>errno</code> being set to <code>EAGAIN</code> or <code>EWOULDBLOCK</code> (depending on the OS implementation).</li>
+</ul>
+<h4 id="4821-case-study-non-blocking-input-read">4.8.2.1 Case study: non-blocking input - <code>read()</code></h4>
+<ul>
+<li>This is a server that emits an English letter every 0.1 sec. This emulates the time a server might have to take to generate a response, e.g. fetching an image from Facebook's database.</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span> kAlphabet = <span class="hljs-string">"abcdefghijklmnopqrstuvwxyz"</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">useconds_t</span> kDelay = <span class="hljs-number">1e5</span>; <span class="hljs-comment">/* 1e5 us is 0.1 sec */</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">handleRequest</span><span class="hljs-params">(<span class="hljs-keyword">int</span> connSock)</span></span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> kPort = <span class="hljs-number">41411</span>;
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-comment">/* create a listening socket */</span>
+  <span class="hljs-keyword">int</span> server = createServerSocket(kPort);
+  <span class="hljs-function">ThreadPool <span class="hljs-title">pool</span><span class="hljs-params">(<span class="hljs-number">128</span>)</span></span>; <span class="hljs-comment">/* we implemented ThreadPool in Assignment 6 */</span>
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-comment">/* wait and return a connected socket */</span>
+    <span class="hljs-keyword">int</span> connSock = accept(server, <span class="hljs-literal">NULL</span>, <span class="hljs-literal">NULL</span>);
+    pool.schedule([connSock]() { handleRequest(connSock); });
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">handleRequest</span><span class="hljs-params">(<span class="hljs-keyword">int</span> connSock)</span> </span>{
+  <span class="hljs-function">sockbuf <span class="hljs-title">sb</span><span class="hljs-params">(connSock)</span></span>;
+  <span class="hljs-function">iosockstream <span class="hljs-title">ss</span><span class="hljs-params">(&amp;sb)</span></span>;
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; kAlphabet.size(); i++) {
+    usleep(kDelay); <span class="hljs-comment">/* wait for 0.1 sec */</span>
+    ss &lt;&lt; kAlphabet[i] &lt;&lt; flush;
+  }
+}
+</div></code></pre>
+<ul>
+<li>This is a client that uses (traditional) blocking <code>read()</code>.</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> kPort = <span class="hljs-number">41411</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-keyword">int</span> clientSock = createClientSocket(<span class="hljs-string">"localhost"</span>, kPort);
+  <span class="hljs-keyword">size_t</span> numSuccessfulReads = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">size_t</span> numBytes = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-keyword">char</span> ch; <span class="hljs-comment">/* a single-byte buffer */</span>
+    <span class="hljs-keyword">ssize_t</span> count = read(clientSock, &amp;ch, <span class="hljs-number">1</span>); <span class="hljs-comment">/* potentially blocking */</span>
+    <span class="hljs-keyword">if</span> (count == <span class="hljs-number">0</span>) <span class="hljs-keyword">break</span>; <span class="hljs-comment">/* break the loop on EOF */</span>
+    numSuccessfulReads++;
+    numBytes += count;
+    <span class="hljs-built_in">cout</span> &lt;&lt; ch &lt;&lt; flush;
+  }
+  close(client);
+
+  <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+  <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Alphabet Length: "</span> &lt;&lt; numBytes &lt;&lt; <span class="hljs-string">" bytes."</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+  <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Num reads: "</span> &lt;&lt; numSuccessfulReads &lt;&lt; <span class="hljs-built_in">endl</span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>Run the client - we discover that there are 26 <code>read()</code> calls:</p>
+<pre class="hljs"><code><div>$ ./blocking-alphabet-client
+abcdefghijklmnopqrstuvwxyz
+Alphabet Length: 26 bytes.
+Num reads: 26
+</div></code></pre>
+<ul>
+<li>This is anther client, which uses <strong>non-blocking</strong> <code>read()</code>.</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> kPort = <span class="hljs-number">41411</span>;
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-comment">/* send connection request to server */</span>
+  <span class="hljs-keyword">int</span> clientSock = createClientSocket(<span class="hljs-string">"localhost"</span>, kPort);
+  setAsNonBlocking(clientSock); <span class="hljs-comment">/* mark the SD as non-blocking */</span>
+
+  <span class="hljs-keyword">size_t</span> numReads = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">size_t</span> numSuccessfulReads = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">size_t</span> numUnsuccessfulReads = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">size_t</span> numBytes = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-keyword">char</span> ch;
+    <span class="hljs-keyword">ssize_t</span> count = read(client, &amp;ch, <span class="hljs-number">1</span>);
+    numReads++;
+    <span class="hljs-keyword">if</span> (count == <span class="hljs-number">0</span>) <span class="hljs-keyword">break</span>; <span class="hljs-comment">/* break the loop on EOF */</span>
+    <span class="hljs-keyword">if</span> (count &gt; <span class="hljs-number">0</span>) { <span class="hljs-comment">/* read in something */</span>
+      numSuccessfulReads++;
+      numBytes += count;
+      <span class="hljs-built_in">cout</span> &lt;&lt; ch &lt;&lt; flush;
+    }
+    <span class="hljs-keyword">else</span> { <span class="hljs-comment">/* didn't read in anything, return -1 as it's non-blocking */</span>
+      assert(errno == EAGAIN || errno == EWOULDBLOCK);
+      numUnsuccessfulReads++;
+    }
+  }  
+  close(client);
+
+  <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+  <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Alphabet Length: "</span> &lt;&lt; numBytes &lt;&lt; <span class="hljs-string">" bytes."</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+  <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Num reads: "</span> &lt;&lt; numReads &lt;&lt; <span class="hljs-string">" ("</span> &lt;&lt; numSuccessfulReads &lt;&lt; <span class="hljs-string">" successful, "</span> &lt;&lt; numUnsuccessfulReads &lt;&lt; <span class="hljs-string">" unsuccessful)."</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>Run the client - we discover that there are 26 successful calls to <code>read()</code> and ~10<sup>7</sup> unsuccessful calls, because the server just emits one letter every 0.1 second:</p>
+<pre class="hljs"><code><div>$ time ./non-blocking-alphabet-client
+abcdefghijklmnopqrstuvwxyz
+Alphabet Length: 26 bytes.
+Num reads: 11268991 (26 successful, 11268964 unsuccessful).
+</div></code></pre>
+<p>Here, <code>read()</code> is non-blocking, because the SD is marked as non-blocking.</p>
+<blockquote>
+<p>Data available? Expect <code>ch</code> to be updated and a return value of <code>1</code>.<br>No data available, ever (i.e. <code>EOF</code>)? Expect a return value of <code>0</code>.<br>No data available right now, but possibly in the future? Expect a return value of <code>-1</code> and <code>errno</code> to be set to <code>EAGAIN</code> or <code>EWOULDBLOCK</code>.</p>
+</blockquote>
+<ul>
+<li>For entirety, the implementation of <code>setAsNonBlocking()</code> is here - Linux gobbledygook.</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-comment">/* mark the SD as non-blocking */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">setAsNonBlocking</span><span class="hljs-params">(<span class="hljs-keyword">int</span> descriptor)</span> </span>{
+  <span class="hljs-keyword">int</span> flags = fcntl(descriptor, F_GETFL);
+  <span class="hljs-keyword">if</span> (flags == <span class="hljs-number">-1</span>) flags = <span class="hljs-number">0</span>; <span class="hljs-comment">/* if fcntl() fails, just go with 0 */</span>
+  fcntl(descriptor, F_SETFL, flags | O_NONBLOCK); <span class="hljs-comment">/* retain other flags */</span>
+}
+</div></code></pre>
+<h4 id="4822-case-study-non-blocking-inputoutput">4.8.2.2 Case study: non-blocking input/output</h4>
+<ul>
+<li>The <code>OutboundFile</code> class is designed to read a local file and push its contents out over a supplied descriptor, and to do so without ever blocking - it does not block on reading from <code>source</code>, and it does not block on writing to <code>sink</code>.</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-keyword">class</span> OutboundFile {
+ <span class="hljs-keyword">public</span>:
+  OutboundFile();
+  <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">initialize</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span> &amp;source, <span class="hljs-keyword">int</span> sink)</span></span>;
+  <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">sendMoreData</span><span class="hljs-params">()</span></span>;
+
+ <span class="hljs-keyword">private</span>: <span class="hljs-comment">/* unimportant for this lecture */</span>
+  <span class="hljs-keyword">int</span> sink, source;
+  <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">size_t</span> kBufferSize = <span class="hljs-number">128</span>;
+  <span class="hljs-keyword">char</span> buffer[kBufferSize];
+  <span class="hljs-keyword">size_t</span> numBytesAvailable, numBytesSent;
+  <span class="hljs-keyword">bool</span> isSending;
+
+  <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">dataReadyToBeSent</span><span class="hljs-params">()</span> <span class="hljs-keyword">const</span></span>;
+  <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">readMoreData</span><span class="hljs-params">()</span></span>;
+  <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">writeMoreData</span><span class="hljs-params">()</span></span>;
+  <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">allDataFlushed</span><span class="hljs-params">()</span></span>;
+};
+</div></code></pre>
+<ul>
+<li>The <code>initialize()</code> method identifies what local file should be used as a source of data and the descriptor (<code>sink</code>) into which that data should be written verbatim.</li>
+<li>The <code>sendMoreData()</code> method pushes as much data as possible to the supplied <code>sink</code>, without blocking. It returns <code>true</code> if it's at all possible there's more data to be sent, and <code>false</code> if all data has been fully pushed out.</li>
+<li>The unit test is this - it's a simple program prints the source code of itself to standard output:</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment">/**
+ * File: outbound-file-test.cc
+ * ---------------------------
+ * Demonstrates how one should use the OutboundFile class
+ * and can be used to confirm that it works properly.
+ */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"outbound-file.h"</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+  OutboundFile obf;
+  obf.initialize(<span class="hljs-string">"outbound-file-test.cc"</span>, STDOUT_FILENO);
+  <span class="hljs-keyword">while</span> (obf.sendMoreData()) {;}
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<ul>
+<li>A larger example of application: implementing a nonblocking server that happily serves up a copy of the server code itself to all clients. This server utilizes non-blocking I/O, instead of multithreading as in 4.3, to handle client connections.
+<blockquote>
+<p>Many company uses non-blocking I/O instead of multithreading because the latter is often error-prone - race conditions and deadlocks caused by carelessness in programming.</p>
+</blockquote>
+</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> kDefaultPort = <span class="hljs-number">12345</span>;
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span> <span class="hljs-title">kFileToServe</span><span class="hljs-params">(<span class="hljs-string">"expensive-server.cc"</span>)</span></span>;
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-keyword">int</span> serverSocket = createServerSocket(kDefaultPort);
+  <span class="hljs-keyword">if</span> (serverSocket == kServerSocketFailure) {
+    <span class="hljs-built_in">cerr</span> &lt;&lt; <span class="hljs-string">"Could not start server.  Port "</span> &lt;&lt; kDefaultPort &lt;&lt; <span class="hljs-string">" is probably in use."</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+  }
+
+  setAsNonBlocking(serverSocket);
+  <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Static file server listening on port "</span> &lt;&lt; kDefaultPort &lt;&lt; <span class="hljs-string">"."</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+  <span class="hljs-built_in">list</span>&lt;OutboundFile&gt; outboundFiles;
+  <span class="hljs-keyword">size_t</span> numConnections = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">size_t</span> numActiveConnections = <span class="hljs-number">0</span>;
+
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-keyword">int</span> clientSocket = accept(serverSocket, <span class="hljs-literal">NULL</span>, <span class="hljs-literal">NULL</span>);
+    <span class="hljs-keyword">if</span> (clientSocket == <span class="hljs-number">-1</span>) {
+      assert(errno == EAGAIN || errno == EWOULDBLOCK);
+    }
+    <span class="hljs-keyword">else</span> { <span class="hljs-comment">/* captured a connection request */</span>
+      OutboundFile obf;
+      obf.initialize(kFileToServe, clientSocket);
+      outboundFiles.push_back(obf);
+      <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Connection #"</span> &lt;&lt; ++numConnections &lt;&lt; <span class="hljs-built_in">endl</span>;
+      <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Queue size: "</span> &lt;&lt; ++numActiveConnections &lt;&lt; <span class="hljs-built_in">endl</span>;
+    }
+
+    <span class="hljs-comment">/* manually multi-plexing: send data to clients, piece by piece */</span>
+    <span class="hljs-keyword">auto</span> iter = outboundFiles.begin();
+    <span class="hljs-keyword">while</span> (iter != outboundFiles.end()) {
+      <span class="hljs-keyword">if</span> (iter-&gt;sendMoreData()) {
+        ++iter;
+      }
+      <span class="hljs-keyword">else</span> { <span class="hljs-comment">/* no more data to send */</span>
+        iter = outboundFiles.erase(iter);
+        <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Queue size: "</span> &lt;&lt; --numActiveConnections &lt;&lt; <span class="hljs-built_in">endl</span>;
+      }
+    }
+  }
+}
+</div></code></pre>
+<ul>
+<li>As you see, if we use non-blocking I/O to handle multiple clients simultaneously, we have to write the multiplexing code ourselves - <strong>a drawback of non-blocking I/O</strong> compared to multithreading, where multiplexing is handled by the scheduler of OS.</li>
+<li>Also note that this server implementation contains <strong>busy-waiting</strong> and thus wastes CPU time. This will be addressed in 4.9 (event-driven programming).</li>
+<li>For your curiosity, the implementation of <code>OutboudFile</code> class is at the end of this note document.</li>
+</ul>
+<h2 id="appendix-implementation-of-outboudfile-class">Appendix: implementation of <code>OutboudFile</code> class</h2>
+<p>The <code>OutboundFile</code> class is designed to read a local file and push its contents out over a supplied descriptor, and to do so without ever blocking.</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/**
+ * File: outbound-file.cc
+ * ----------------------
+ * Presents the implementation of the OutboundFile class.
+ */</span>
+
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+OutboundFile::OutboundFile() {
+  isSending = <span class="hljs-literal">false</span>;
+}
+
+<span class="hljs-keyword">void</span> OutboundFile::initialize(<span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span>&amp; source, <span class="hljs-keyword">int</span> sink) {
+  <span class="hljs-keyword">this</span>-&gt;source = open(source.c_str(), O_RDONLY | O_NONBLOCK);
+  <span class="hljs-keyword">this</span>-&gt;sink = sink;
+  setAsNonBlocking(<span class="hljs-keyword">this</span>-&gt;sink);
+  numBytesAvailable = numBytesSent = <span class="hljs-number">0</span>;
+  isSending = <span class="hljs-literal">true</span>;
+}
+
+<span class="hljs-keyword">bool</span> OutboundFile::sendMoreData() {
+  <span class="hljs-keyword">if</span> (!isSending) <span class="hljs-keyword">return</span> !allDataFlushed();  
+  <span class="hljs-keyword">if</span> (!dataReadyToBeSent()) {
+    readMoreData();
+    <span class="hljs-keyword">if</span> (!dataReadyToBeSent()) 
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+  }  
+  writeMoreData();
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+}
+
+<span class="hljs-keyword">bool</span> OutboundFile::dataReadyToBeSent() <span class="hljs-keyword">const</span> {
+  <span class="hljs-keyword">return</span> numBytesSent &lt; numBytesAvailable;
+}
+
+<span class="hljs-keyword">void</span> OutboundFile::readMoreData() {
+  <span class="hljs-comment">/* change all that by getting a chunk of readily available data
+   * from (blocking) local file */</span>
+  <span class="hljs-keyword">ssize_t</span> incomingCount = read(source, buffer, kBufferSize);
+  <span class="hljs-keyword">if</span> (incomingCount == <span class="hljs-number">-1</span>) {
+    assert(errno == EWOULDBLOCK);
+    <span class="hljs-keyword">return</span>;
+  }
+
+  numBytesAvailable = incomingCount;
+  numBytesSent = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">if</span> (numBytesAvailable &gt; <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span>;
+  
+  close(source);
+  <span class="hljs-keyword">if</span> (isSocketDescriptor(sink)) shutdown(sink, SHUT_WR);
+  <span class="hljs-keyword">else</span> setAsBlocking(sink);
+  isSending = <span class="hljs-literal">false</span>;
+}
+
+<span class="hljs-keyword">void</span> OutboundFile::writeMoreData() {
+  <span class="hljs-keyword">auto</span> old = signal(SIGPIPE, SIG_IGN);
+  <span class="hljs-keyword">ssize_t</span> outgoingCount = write(sink, buffer + numBytesSent, 
+                                numBytesAvailable - numBytesSent);
+  signal(SIGPIPE, old);
+  <span class="hljs-keyword">if</span> (outgoingCount == <span class="hljs-number">-1</span>) {
+    <span class="hljs-keyword">if</span> (errno == EPIPE) {
+      isSending = <span class="hljs-literal">false</span>;
+    }
+    <span class="hljs-keyword">else</span> {
+      assert(errno == EWOULDBLOCK);
+    } 
+  }
+  <span class="hljs-keyword">else</span> {
+    numBytesSent += outgoingCount;
+  }
+}
+
+<span class="hljs-keyword">bool</span> OutboundFile::allDataFlushed() {
+  <span class="hljs-keyword">bool</span> allBytesFlushed;
+  <span class="hljs-keyword">if</span> (isSocketDescriptor(sink)) {
+    assert(isNonBlocking(sink));
+    <span class="hljs-keyword">ssize_t</span> count = read(sink, buffer, <span class="hljs-keyword">sizeof</span>(buffer));
+    allBytesFlushed = count == <span class="hljs-number">0</span>;
+  }
+  <span class="hljs-keyword">else</span> {
+    assert(isBlocking(sink));
+    <span class="hljs-keyword">int</span> numOutstandingBytes = <span class="hljs-number">0</span>;
+    ioctl(sink, SIOCOUTQ, &amp;numOutstandingBytes);
+    allBytesFlushed = numOutstandingBytes == <span class="hljs-number">0</span>;
+  }
+  
+  <span class="hljs-keyword">if</span> (allBytesFlushed) close(sink);
+  <span class="hljs-keyword">return</span> allBytesFlushed;
+}
+</div></code></pre>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

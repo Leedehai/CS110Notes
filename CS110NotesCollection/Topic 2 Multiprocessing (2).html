@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Multiproc (2)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-2-multiprocessing-2">Topic 2 Multiprocessing (2)</h1>
+<div id="author-signature">Leedehai</div>
+Monday, April 17, 2017
+<h2 id="24-execute-a-program-execvp">2.4 Execute a program: <code>execvp()</code></h2>
+<ul>
+<li><code>execvp()</code> belongs to the <code>exec</code> system call family that run executable files.</li>
+<li>Prototype: <code>int execvp(const char *file, char *const argv[]);</code></li>
+<li>If <code>execvp()</code> is called by a process, it will stop the caller process, the file given by <code>file</code> will be loaded into the caller's memory space and <strong>overwrite</strong> the program there, and the process is <strong>rebooted</strong>. Then, <code>argv</code> will be passed to program's <code>main()</code> function and execution starts.
+<blockquote>
+<p>As a result, once the specified program file starts its execution, the original program in the caller's memory space is gone and is replaced by the new process. This act is termed <em>overlay</em>. In short, it is &quot;<strong>overwrite and reboot</strong>&quot;.</p>
+</blockquote>
+</li>
+<li>Note that the <code>argv</code> is the same as the main function parameters discussed in 1.1. Its first element is a <code>char *</code> points to the executable's name string, and the last is a <code>NULL</code> pointer.</li>
+<li>Though the memory of the original process that invokes <code>execvp()</code> is overwritten, the process itself continue to exist, verified by the fact that the kernel-maintained <strong>process ID remains unchanged</strong>, and it is <strong>still the child process of its parent</strong>.</li>
+<li><code>execvp()</code> returns <code>-1</code> on failure (e.g. cannot find file, access denied). It <strong>won't return on success</strong>, however, since the original process is already overwritten, including the instruction of calling <code>execvp()</code> itself.
+<blockquote>
+<p>The two bullet-points above are of great significance, as we will rely on it to write code.</p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>SIDE NOTE:<br>In <code>execvp()</code>, &quot;v&quot; means arguments are passed in as an array (vector) of pointers, and &quot;p&quot; means using the <a href="https://en.wikipedia.org/wiki/Environment_variable">environmental variable</a> <code>PATH</code> to find the specified executable file if the string pointed by the first argument doesn't contain a slash <code>/</code>.</p>
+</blockquote>
+<blockquote>
+<p>SIDE NOTE:<br> With <code>execvp()</code>, you can deal with off-the-shelf programs that are provided as binary executables, instead of in the form of source code.</p>
+</blockquote>
+<h3 id="241-an-familiar-example-the-shell-command-find">2.4.1 An familiar example: the shell command <code>find</code></h3>
+<p>In a terminal, a typical call to <code>find</code> is like this:</p>
+<pre class="hljs"><code><div>$ find /usr/include -name stdio.h -print
+</div></code></pre>
+<p>Note that, the following arguments &quot;<code>/usr/include</code>&quot;, &quot;<code>-name</code>&quot;, &quot;<code>stdio.h</code>&quot;, &quot;<code>-print</code>&quot; are <strong>not</strong> directly fed into the program <code>find</code>, but is fed into the shell program, together with the argument &quot;<code>find</code>&quot;.</p>
+<p>In the shell program, arguments are passed to a <code>execvp()</code> call, like this:</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* arguments passed to the shell program */</span>
+<span class="hljs-keyword">char</span> *argv[] = {<span class="hljs-string">"find"</span>, <span class="hljs-string">"/usr/include"</span>, <span class="hljs-string">"-name"</span>, 
+                <span class="hljs-string">"stdio.h"</span>, <span class="hljs-string">"-print"</span>, <span class="hljs-literal">NULL</span>};
+execvp(argv[<span class="hljs-number">0</span>], argv);
+</div></code></pre>
+<p>An illustration of what happens in the caller process's memory space:</p>
+<pre class="hljs"><code><div>┌───────────────────────────┐         ┌───────────────────────────┐  
+│                           │         │                           │
+:           kernel          :         :           kernel          :   
+│                           │         │                           │
+╠═══════════════════════════╣         ╠═══════════════════════════╣ 
+:                           :         :                           :     
+├───────────────────────────┤- - - - -├───────────────────────────┤    
+│                           │         │ &quot;find&quot;,...,&quot;-print&quot;,NULL, │ stack
+│           stack           │         │ argv                      │   
+│                           │         │─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─│&lt;-%rsp
+│─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─│&lt;-%rsp   │             ▼             │    
+│             ▼             │         │                           │
+│             ▲             │         │                           │
+│─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─│         │             ▲             │ 
+│           heap            │         │─ ─ ─ - - - ─│─ - - - ─ ─ ─│  heap
+│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│         │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│   
+│        bss, data,..       │         │        bss, data,..       │  
+│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│         │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│ 
+│       program text        │&lt;-%rip   │      NEW program text     │  
+│   (binary instructions)   │         │   (binary instructions)   │
+├───────────────────────────┤- - - - -├───────────────────────────┤&lt;-%rip
+:                           :         :                           :
+└───────────────────────────┘ 0x0     └───────────────────────────┘ 0x0 
+       Before execvp() -&gt; overwrite &amp; reboot -&gt; After execvp()      
+</div></code></pre>
+<h3 id="242-the-trio-fork-waitpid-and-execvp">2.4.2 &quot;The trio&quot;: <code>fork()</code>, <code>waitpid()</code>, and <code>execvp()</code></h3>
+<p>Since we know,</p>
+<ul>
+<li><code>fork()</code> replicates the calling process (parent) to a new process (child), and returns to child's PID to the parent;</li>
+<li><code>waitpid()</code> blocks the calling process (parent) and waits on the child specified by its PID;</li>
+<li><code>execvp()</code> replace the entire memory space of the calling process with a new program's context, but does not change the process's PID and parent-child relationship.</li>
+</ul>
+<p>We can emulate a shell's behavior! The shell process fork itself, and let the child call <code>execvp()</code> to transform the child to another program's instance. The parent just waits on the child (no longer a replica of the parent) to terminate, and reap the zombie.</p>
+<p>A nice illustration:</p>
+<pre class="hljs"><code><div>            execvp()      (another routine)            reaped
+            ┌──●~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~●─ ─ ─○ 
+     child  │  child overwritten                            
+            │                                                
+parent      │                                        
+────────────┴──────────(w a i t)───────────────────────────▶
+          fork()
+</div></code></pre>
+<blockquote>
+<p>SIDE NOTE:<br>In modern OSes, <code>fork()</code> might not completely replicate the calling process; it might replicate the calling process <em>lazily</em>, that is, it only replicates the portion that is necessary. One of the reasons is that if the newly replicated process is to be gutted by an <code>execvp()</code> a few instructions later, there is no point in copying the whole original process.</p>
+</blockquote>
+<h4 id="2421-example-of-the-trio-working-together-system">2.4.2.1 Example of the trio working together: <code>system</code></h4>
+<p>We have a program called <code>system</code>. It uses the shell the execute whatever command passed in as the argument.</p>
+<p>For example, if a program calls <code>system(make)</code>, then this program will stall, and the executable <code>make</code> will be invoked to perform a &quot;make&quot; (compile, link, ...) in the current directory.</p>
+<p>The code is</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/wait.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"string.h"</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"exit-utils.h"</span></span>
+
+<span class="hljs-comment">/* static global: visible only in this file */</span>
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kExecFailed = <span class="hljs-number">1</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">mysystem</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *command)</span> </span>{
+  <span class="hljs-keyword">pid_t</span> pid = fork();
+  <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) { <span class="hljs-comment">/* for the child process */</span>
+    <span class="hljs-keyword">char</span> *args[] = {<span class="hljs-string">"/bin/sh"</span>, <span class="hljs-string">"-c"</span>, (<span class="hljs-keyword">char</span> *) command, <span class="hljs-literal">NULL</span>};
+    execvp(arguments[<span class="hljs-number">0</span>], args); <span class="hljs-comment">/* transform child's entire process */</span>
+
+    <span class="hljs-comment">/* if the child process reaches here, the execvp() failed */</span>
+    <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"execvp failed to invoke this: %s.\n"</span>, command);
+    <span class="hljs-built_in">exit</span>(kExecFailed);
+  }
+  
+  <span class="hljs-comment">/* the code below are only for the parent */</span>
+  <span class="hljs-keyword">int</span> status;
+  waitpid(pid, &amp;status, <span class="hljs-number">0</span>);
+  <span class="hljs-keyword">if</span> (WIFEXITED(status)) <span class="hljs-comment">/* if the child terminates normally */</span>
+    <span class="hljs-comment">/* use the child's exit status as the mysystem()'s return value */</span>
+    <span class="hljs-keyword">return</span> WEXITSTATUS(status);
+  <span class="hljs-keyword">else</span>
+    <span class="hljs-comment">/* use the child's exit status to indicate the error */</span>
+    <span class="hljs-keyword">return</span> -WTERMSIG(status);
+}
+</div></code></pre>
+<p>Here is a simple unit test:</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">mysystem</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *command)</span></span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">size_t</span> kMaxLen = <span class="hljs-number">2048</span>; <span class="hljs-comment">/* static global */</span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-keyword">char</span> buf[kMaxLen];
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"$$ "</span>);
+    fgets(buf, kMaxLine, <span class="hljs-built_in">stdin</span>); <span class="hljs-comment">/* read string to char array */</span>
+
+    <span class="hljs-keyword">if</span> (feof(<span class="hljs-built_in">stdin</span>)) <span class="hljs-keyword">break</span>; <span class="hljs-comment">/* if reaches EOF of stdin (as file), break */</span>
+
+    <span class="hljs-comment">/* don't forget to replace the trailing '\n' */</span>
+    buf[<span class="hljs-built_in">strlen</span>(buf) - <span class="hljs-number">1</span>] = <span class="hljs-string">'\0'</span>;
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"retcode = %d\n"</span>, mysystem(buf));
+  }
+  
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"\n"</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>You can compile it and name the program as <code>myshell</code>. Now you have your own version of shell. In the real shell's terminal, you call the program <code>myshell</code>, and do works in that (pseudo) shell terminal implemented by yourself. You can even call <code>myshell</code> again in that (pseudo) shell terminal...</p>
+<blockquote>
+<p>Just like the movie <a href="https://en.wikipedia.org/wiki/Inception">Inception (2010)</a>: a dream inside a dream...</p>
+</blockquote>
+<pre class="hljs"><code><div>                &quot;/bin/sh -c make&quot;    &quot;/bin/sh -c ls&quot;
+                ┌~~●***********●─ ○  ┌~~●***********●─ ○
+                │ /bin/sh            │ /bin/sh       
+                │                    │                       reaped
+           ┌─●~~┴~~~~(wait)~~~~~~~~~~┴~~~~(wait)~~~~~~~~~~●─ ─ ○
+real       │  myshell                                completes       
+shell      │                                                
+───────────┴───────────────────(w a i t)────────────────────────────▶
+</div></code></pre>
+<blockquote>
+<p>As a more familiar example, you can rename the executable <code>myshell</code> to &quot;python&quot;, and re-implement <code>mysystem()</code> properly, then you have your own python interpreter<code>:)</code></p>
+</blockquote>
+<pre class="hljs"><code><div>leedehai@host:~$ python
+Python 2.7.12 |Anaconda 4.1.1 (x86_64)| (default, Jul  2 2016, 17:43:17)
+&gt;&gt;&gt; print &quot;hello&quot;
+hello
+&gt;&gt;&gt; 40 + 2
+42
+&gt;&gt;&gt;
+</div></code></pre>
+<blockquote>
+<p>SIDE NOTE:<br> In a shell, if a command line is trailing by <code>&amp;</code>, as in <code>sleep 10 &amp;</code>, the process(es) created by it will run in background, without suspending the shell process as it would have done without <code>&amp;</code>. Such process is called the <em>background process</em>, opposed to the <em>foreground process</em>.</p>
+</blockquote>
+<h4 id="2422-simplesh-a-miniature-shell-not-unlike-the-normal-shells">2.4.2.2 <code>simplesh</code>: a miniature shell not unlike the normal shells</h4>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;     // exit</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;      // for printf</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;    // for bool, true, false</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;     // for strchr, strcmp</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;     // for fork, execve</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/wait.h&gt;   // for waitpid</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"exit-utils.h"</span> <span class="hljs-comment">// </span></span>
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *<span class="hljs-keyword">const</span> kCommandPrompt = <span class="hljs-string">"simplesh&gt;"</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> kMaxCommandLength = <span class="hljs-number">2048</span>; <span class="hljs-comment">// in characters</span>
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> kMaxArgumentCount = <span class="hljs-number">128</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kForkFailed = <span class="hljs-number">1</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kWaitFailed = <span class="hljs-number">2</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">pullRest</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-keyword">while</span> (getchar() != <span class="hljs-string">'\n'</span>);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">readCommand</span><span class="hljs-params">(<span class="hljs-keyword">char</span> command[], <span class="hljs-keyword">size_t</span> len)</span> </span>{
+  <span class="hljs-keyword">char</span> control[<span class="hljs-number">64</span>] = {<span class="hljs-string">'\0'</span>};
+  command[<span class="hljs-number">0</span>] = <span class="hljs-string">'\0'</span>;
+  <span class="hljs-built_in">sprintf</span>(control, <span class="hljs-string">"%%%zu[^\n]%%c"</span>, len);
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%s "</span>, kCommandPrompt);
+    <span class="hljs-keyword">char</span> termch;
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">scanf</span>(control, command, &amp;termch) &lt; <span class="hljs-number">2</span>) { pullRest(); <span class="hljs-keyword">return</span>; }
+    <span class="hljs-keyword">if</span> (termch == <span class="hljs-string">'\n'</span>) <span class="hljs-keyword">return</span>;
+    <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">"Command shouldn't exceed %hu characters.  Ignoring.\n"</span>, kMaxCommandLength);
+    pullRest();
+  }
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">char</span> *<span class="hljs-title">skipSpaces</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *str)</span> </span>{
+  <span class="hljs-keyword">while</span> (*str == <span class="hljs-string">' '</span>) str++;
+  <span class="hljs-keyword">return</span> (<span class="hljs-keyword">char</span> *) str;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">parseCommandLine</span><span class="hljs-params">(<span class="hljs-keyword">char</span> *command, <span class="hljs-keyword">char</span> *arguments[], <span class="hljs-keyword">int</span> len)</span> </span>{
+  command = skipSpaces(command);
+  <span class="hljs-keyword">int</span> count = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">while</span> (count &lt; len - <span class="hljs-number">1</span> &amp;&amp; *command != <span class="hljs-string">'\0'</span>) {
+    arguments[count++] = command;
+    <span class="hljs-keyword">char</span> *found = <span class="hljs-built_in">strchr</span>(command, <span class="hljs-string">' '</span>);
+    <span class="hljs-keyword">if</span> (found == <span class="hljs-literal">NULL</span>) <span class="hljs-keyword">break</span>;
+    *found = <span class="hljs-string">'\0'</span>;
+    command = found + <span class="hljs-number">1</span>;
+    command = skipSpaces(command);
+  }
+  arguments[count] = <span class="hljs-literal">NULL</span>;
+  <span class="hljs-keyword">return</span> count;
+}
+
+<span class="hljs-comment">// left in for debugging purposes</span>
+<span class="hljs-comment">/* static */</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printCommandLineArguments</span><span class="hljs-params">(<span class="hljs-keyword">char</span> *arguments[])</span> </span>{
+  <span class="hljs-keyword">int</span> count = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">while</span> (*arguments != <span class="hljs-literal">NULL</span>) {
+    count++;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%2d: \"%s\"\n"</span>, count, *arguments);
+    arguments++;
+  }
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">bool</span> <span class="hljs-title">handleBuiltin</span><span class="hljs-params">(<span class="hljs-keyword">char</span> *arguments[])</span> </span>{
+  <span class="hljs-keyword">if</span> (strcasecmp(arguments[<span class="hljs-number">0</span>], <span class="hljs-string">"quit"</span>) == <span class="hljs-number">0</span>) <span class="hljs-built_in">exit</span>(<span class="hljs-number">0</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">strcmp</span>(arguments[<span class="hljs-number">0</span>], <span class="hljs-string">"&amp;"</span>) == <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> pid_t <span class="hljs-title">forkProcess</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-keyword">pid_t</span> pid = fork();
+  exitIf(pid == <span class="hljs-number">-1</span>, kForkFailed, <span class="hljs-built_in">stderr</span>, <span class="hljs-string">"fork function failed.\n"</span>);
+  <span class="hljs-keyword">return</span> pid;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">waitForChildProcess</span><span class="hljs-params">(<span class="hljs-keyword">pid_t</span> pid)</span> </span>{
+  exitUnless(waitpid(pid, <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>) == pid, kWaitFailed,
+         <span class="hljs-built_in">stderr</span>, <span class="hljs-string">"Error waiting in foreground for process %d to exit"</span>, pid);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-keyword">char</span> command[kMaxCommandLength + <span class="hljs-number">1</span>];
+    readCommand(command, <span class="hljs-keyword">sizeof</span>(command) - <span class="hljs-number">1</span>);
+    <span class="hljs-keyword">if</span> (feof(<span class="hljs-built_in">stdin</span>)) <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">char</span> *arguments[kMaxArgumentCount + <span class="hljs-number">1</span>];
+    <span class="hljs-keyword">int</span> count = parseCommandLine(command, arguments, <span class="hljs-keyword">sizeof</span>(arguments)/<span class="hljs-keyword">sizeof</span>(arguments[<span class="hljs-number">0</span>]));
+    <span class="hljs-keyword">if</span> (count == <span class="hljs-number">0</span>) <span class="hljs-keyword">continue</span>;
+    <span class="hljs-keyword">bool</span> builtin = handleBuiltin(arguments);
+    <span class="hljs-keyword">if</span> (builtin) <span class="hljs-keyword">continue</span>; <span class="hljs-comment">// it's been handled, and backgrounding a builtin isn't an option</span>
+    <span class="hljs-keyword">bool</span> isBackgroundProcess = <span class="hljs-built_in">strcmp</span>(arguments[count - <span class="hljs-number">1</span>], <span class="hljs-string">"&amp;"</span>) == <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">if</span> (isBackgroundProcess) arguments[--count] = <span class="hljs-literal">NULL</span>; <span class="hljs-comment">// overwrite "&amp;"</span>
+    <span class="hljs-keyword">pid_t</span> pid = forkProcess();
+    <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">if</span> (execvp(arguments[<span class="hljs-number">0</span>], arguments) &lt; <span class="hljs-number">0</span>) {
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%s: Command not found\n"</span>, arguments[<span class="hljs-number">0</span>]);
+    <span class="hljs-built_in">exit</span>(<span class="hljs-number">0</span>);
+      }
+    }
+    
+    <span class="hljs-keyword">if</span> (!isBackgroundProcess) {
+      waitForChildProcess(pid);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-comment">// don't wait for child, and let it roll in the background,</span>
+      <span class="hljs-comment">// but recognize that we currently aren't reaping any background</span>
+      <span class="hljs-comment">// processes when they terminate, and that's something that</span>
+      <span class="hljs-comment">// we need to fix in future iterations of the shell</span>
+      <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%d %s\n"</span>, pid, command);
+    }
+  }
+  
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"\n"</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>The assignment will be a more sophisticated shell.</p>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

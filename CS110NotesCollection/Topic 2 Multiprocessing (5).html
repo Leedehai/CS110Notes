@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Multiproc (5)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-2-multiprocessing-5">Topic 2 Multiprocessing (5)</h1>
+<div id="author-signature">Leedehai</div>
+Monday, April 24, 2017<br>Friday, April 28, 2017
+<h2 id="27-how-does-multiprocessing-works">2.7 How does multiprocessing works?</h2>
+<blockquote>
+<p>Q1: How does one process behave as if it is the <strong>only</strong> process running in the memory and occupies all the virtual memory space?<br>Q2: The number of processes running on a machine is almost always more than the number of CPU's logical cores. How does the CPU handle them?</p>
+</blockquote>
+<h3 id="271-virtual-physical-memory-mapping">2.7.1 Virtual-physical memory mapping</h3>
+<ul>
+<li>The volume of the virtual memory space for a process is quite large, typically the same size as the physical main memory.</li>
+<li>However, a process does not need that much space. For example, its stack may only occupy several KB in the virtual memory space (several GB).</li>
+<li>Virtual address space is slivered into multiple <strong>fixed-size</strong> parts, termed <em>page</em>s. The size of a page is typically a perfect power of 2 (e.g. 256 bytes).</li>
+<li>Actually occupied <strong>pages are mapped into the physical memory</strong>. The memory mapping unit (MMU) hardware inside the CPU is responsible for memory-lookup, with the help of a lookup table, called the <em>page table</em>, maintained by the kernel.
+<blockquote>
+<p>If a page is not used, it is not mapped and thus does not have an entry on the page table.</p>
+</blockquote>
+</li>
+<li>The page table is effectively a big dictionary. Each entry's key is a combination of the PID and the virtual address of the page, and the corresponding value is the physical address of that page (and other info). A process corresponds to multiple entries, the number of which depends on the actual size of memory it occupies.</li>
+<li>The MMU uses the <strong>page table entry</strong> (PTE) and the virtual address's <strong>offset from its page's start</strong>, to find the corresponding physical address.
+<blockquote>
+<p>The size of a page is a trade-off between time and space efficiency. If the page size is too small, the page table becomes too large; if the page size is too large, physical memory space is wasted.</p>
+</blockquote>
+</li>
+<li>If the process requests additional memory pages (at which time the kernel issues an &quot;page fault&quot; exception), a new entry is set up in the page table, dedicating an available block in the physical memory to the process.</li>
+<li>Through this mechanism, a process may actually occupies a tiny fraction of the physical memory, though its virtual memory space is the same size as the main memory.</li>
+<li>Processes' pages may be interleaved and out-of-order in the physical memory.</li>
+</ul>
+<p>A simplified illustration.</p>
+<pre class="hljs"><code><div>┌───────────────────────────┐ MMU look-up ┌───────────────────────────┐
+│                           │     ┌──────▶│       1207: page 3        │
+│       kernel space        │     │       ├───────────────────────────┤
+│                           │     │ ┌────▶│       1207: page 0        │
+├───────────────────────────┤     │ │     ├───────────────────────────┤
+│     (unused, unmapped)    │     │ │     │ (taken by another process)│
+├───────────────────────────┤     │ │     ├───────────────────────────┤
+│       1207: page 0        │─────│─┘     │                           │
+├───────────────────────────┤     │       │            ...            │
+│       1207: page 1        │─────│─┐     │                           │
+├───────────────────────────┤     │ │     │                           │
+│       1207: page 2        │─────│┐│     ├───────────────────────────┤
+├───────────────────────────┤     │└│────▶│       1207: page 2        │
+│     (unused, unmapped)    │     │ │     ├───────────────────────────┤
+├───────────────────────────┤     │ └────▶│       1207: page 1        │
+│            ...            │     │       ├───────────────────────────┤
+│                           │     │       │ (taken by another process)│
+├───────────────────────────┤     │       ├───────────────────────────┤
+│       1207: page 3        │─────┘       │                           │
+├─────────────────0x6000acff┤             │            ...            │
+│       1207: page 4        │───────┐     │                           │
+├─────────────────0x6000ac00┤       │     │                           │
+│            ...            │       │     ├─────────────────0x2cccfaff┤
+│                           │       └────▶│       1207: page 4        │
+└───────────────────────────┘             └─────────────────0x2cccfa00┘   
+virtual memory of proc. 1207                    physical memory
+</div></code></pre>
+<h3 id="272-memory-manager-and-lazy-mapping">2.7.2 Memory manager and lazy mapping</h3>
+<p>The memory manager is a component of a OS kernel that is responsible for virtual-physical memory mapping.</p>
+<h4 id="2721-the-layout-of-an-executable">2.7.2.1 The layout of an executable</h4>
+<p>Illustrated below is the general layout of an executable file, the final output of a compiling system.</p>
+<blockquote>
+<p>SIDE NOTE:<br>There are many executable file format, such as Unix's 32-bit ELF and 64-bit ELF, macOS and iOS's Mach-O, and Window's PE.</p>
+</blockquote>
+<pre class="hljs"><code><div>┌─────────────────────────────┐
+│          bss info           │ &lt;- info of uninitialized global variables,
+│ (uninitialized global var.) │    like their sizes
+├ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤
+│           rodata            │ &lt;- read-only global variables, i.e. global
+│     (const global var.)     │    variables declared with &quot;const&quot;.
+├ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤
+│            data             │ &lt;- other global variables.
+│        (global var.)        │
+├─────────────────────────────┤
+│                             │
+│                             │
+│                             │ &lt;- binary instructions stored here.
+│            text             │
+│    (binary instructions)    │
+│                             │
+│                             │
+│                             │
+└─────────────────────────────┘file start
+</div></code></pre>
+<p>Note that the &quot;bss&quot; segment in the executable file does not store the uninitialized global variables themselves, only their basic information (e.g. their sizes). That being said, uninitialized global variables of a few primitive types in C/C++, like <code>int</code> and <code>bool</code>, can be filled with <code>0</code> during loading time.</p>
+<h4 id="2722-memory-management">2.7.2.2 Memory management</h4>
+<ul>
+<li>
+<p>When process called <code>execvp()</code> (or similar ones), the <em>loader</em> begins to load the intended program's executable into the process's virtual memory space.</p>
+<ul>
+<li>The loader creates segments in the virtual memory space for text, data, and rodata, according to their size information, but does not actually write bits into them.</li>
+<li>The loader creates a bss segment in the virtual memory space according to the size information stored in the bss segment of the executable file.</li>
+<li>The loader creates the stack in the virtual memory space. The initial stack size is the loader's &quot;best guess&quot;. Similarly, the loader creates the heap in the virtual memory space.</li>
+</ul>
+<blockquote>
+<p>The stack is meant to store automatic variables. The heap is meant to store static variables and memory chunks that is allocated dynamically.</p>
+</blockquote>
+<ul>
+<li>Note that the loader only creates the segments in the virtual memory space; they are not necessarily back by the physical memory.</li>
+</ul>
+</li>
+<li>
+<p>Up to this point, the virtual memory space is <strong>not</strong> mapped to the physical memory.</p>
+</li>
+<li>
+<p>When execution begins, the instruction counter points to the starting virtual address of the text segment, and then the MMU maps the virtual page around that virtual address to the physical memory, and then instructions are fetched from the executable file on disk (or typically, cache) to fill that physical page.</p>
+<blockquote>
+<p>Indeed, only <strong>part of the instructions are actually written into the physical memory</strong>. For example, if a program is inside a while-true loop, then typically only one or two pages that stores the instructions in that loop are written to the physical memory. If the system determines it needs more, it will fetch more instructions from the executable file accordingly.</p>
+</blockquote>
+</li>
+<li>
+<p>Likewise, only when the program wants to access a global variable does the virtual page on which global variable reside be mapped into the physical memory. It is the same case for the stack and heap.</p>
+</li>
+</ul>
+<blockquote>
+<p>This conservative mapping mechanism is termed <em>lazy mapping</em>, which is meant to save physical memory space and thus support multiprocessing, with the cost of time efficiency.</p>
+</blockquote>
+<ul>
+<li>The physical page continues to exist until the OS determines the physical memory is nearly full, at which point the OS evicts pages that it deemed useless (usually according to the page's time stamp). The evicted pages are gone or transferred into cache or disk for future use. So even the eviction procedure is &quot;lazy&quot;.</li>
+</ul>
+<h3 id="273-scheduler-and-context-switch">2.7.3 Scheduler and context switch</h3>
+<p>The scheduler is a component of the kernel that is responsible for context switching, i.e. interleaving the execution flow of processes.</p>
+<h4 id="2731-context-switch">2.7.3.1 Context switch</h4>
+<ul>
+<li>Context switch is a procedure that the kernel interleaves the execution flow of multiple processes.</li>
+<li>When performing a context switch,
+<ul>
+<li><strong>CPU - memory</strong>: the kernel stores all the info on the CPU registers critical to the process currently running on the CPU in to a data structure, <em>switchframe</em> (or referred to as <em>process control block</em>, PCB), in the kernel memory, and</li>
+<li><strong>memory - CPU</strong>: load another process's info from the switchframe on memory to CPU registers, so the process continues to run <strong>as if it has never left</strong>.</li>
+</ul>
+<blockquote>
+<p>SIDE NOTE:<br>The CPU registers include <code>rip</code> (instruction counter), <code>rsp</code> (the top of the stack), <code>rax</code> (return value), <code>rdi</code> (first argument) .. on a x86 CPU.</p>
+</blockquote>
+</li>
+</ul>
+<pre class="hljs"><code><div>                                               
+   process A             OS             process B
+       ┃ :                                      
+       ┃ #101 (instruction)                               │
+       ┃ #102                                             ▼ time
+   ─ ─ ▼ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─      tick
+              save A's reg. value to memory  
+             load B's reg. value from memory             
+   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┰ ─ ─ 
+                                               ┃
+                                               :
+                                               ┃
+   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ▼ ─ ─      tick
+              save B's reg. value to memory
+             load A's reg. value from memory             
+   ─ ─ ┰ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+       ┃ #103                                      
+       ┃ #104 
+       : :                                   
+   ─ ─ ▼ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─      tick
+</div></code></pre>
+<h4 id="2732-three-classes-of-processes-the-running-ready-and-blocked">2.7.3.2 Three classes of processes: the running, ready, and blocked</h4>
+<ul>
+<li>Processes that are alive (i.e. initiated and not terminated) are categorized by the kernel into three classes:
+<ul>
+<li>The running, processes that are actively executing on the CPU. Each CPU core can handle at most <strong>one process</strong> at a time.</li>
+<li>The ready, processes that are temporarily off the CPU but is ready to be reloaded back on the CPU. A process typically spends the majority of its lifetime here.</li>
+<li>The blocked, processes that are blocked (i.e. suspended), e.g. by <code>sleep()</code>, <code>waitpid()</code>, <code>sigsuspend()</code>, other signals, or waiting for a keystroke with an empty buffer.</li>
+</ul>
+</li>
+<li>One CPU core can handle one process at a time. If the time window expires, the process is transferred to the &quot;ready&quot; class and another process from the &quot;ready&quot; class is loaded in. If the process is blocked, it is immediately demoted to the &quot;blocked&quot; class.</li>
+<li>Processes in the &quot;ready&quot; class are stored in what is known as a <em>ready queue</em>, each node of which is a snapshot (switchframe) of a process's register info taken at the instant when the process is switched out.</li>
+<li>Processes in the &quot;blocked&quot; class are stored in what is effectively a set, each node of which is also a snapshot of a process's register info. A blocked process stays in the &quot;blocked&quot; class until the event that triggers its revival happens, at which time the kernel would lift the process's switchframe out of the set and put it to the ready queue.
+<blockquote>
+<p>SIDE NOTE:<br> Therefore, you cannot rely on a <code>sleep()</code> call to maintain a precise timer, as copying the snapshot from the set to the ready queue and waiting in the queue consume extra time (i.e. CPU periods).</p>
+</blockquote>
+</li>
+</ul>
+<p>A process's lifetime illustrated in a state diagram:</p>
+<pre class="hljs"><code><div>             ┌───────────────┐                    ┌────────────┐
+             │    running    │ exit(), SIGKILL... │ terminated │
+         ┌───┤ (one per core)├────────────────────▶  (zombie)  │ =&gt; reap
+         │   └────┬─────▲────┘                    └────────────┘
+         │  switch│     │switch                          
+         │     out│     │in                          
+  sleep()│   ┌────▼─────┴────┐                     
+waitpid()│   │     ready     │ admitted&amp;initiated ┌────────────┐
+  SIGSTOP│   │ (ready queue) ◀────────────────────┤  created   │ &lt;= create
+      ...│   └───────▲───────┘                    └────────────┘
+         │           │                            
+         │           │ event of interest                           
+         │   ┌───────┴───────┐                     
+         │   │    blocked    │                     
+         └───▶ (blocked set) │                     
+             └───────────────┘                     
+</div></code></pre>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

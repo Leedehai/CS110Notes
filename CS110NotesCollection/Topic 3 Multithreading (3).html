@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Multithrd (3)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-3-multithreading-3">Topic 3 Multithreading (3)</h1>
+<div id="author-signature">Leedehai</div>
+Firday, May 5, 2017<br>Monday, May 8, 2017
+<blockquote>
+<p>When coding with threads, you need to ensure: <br>- that there are no possibility of <strong>race condition</strong>s, and...<br>- that there's no possibility of <strong>deadlock</strong>.</p>
+</blockquote>
+<h2 id="35-the-threat-of-deadlock-dining-philosophers-problem-kob">3.5 The threat of deadlock: dining philosophers problem (KOB)</h2>
+<p><code>mutex</code> is not the panacea of all synchronization problems in multithreading. In fact, <code>mutex</code> can solve the problem of race conditions (as in 3.4), but not the one we are going to describe below.</p>
+<blockquote>
+<p>In computer science, the <a href="https://en.wikipedia.org/wiki/Dining_philosophers_problem">dining philosophers problem</a> is an example problem often used in concurrent algorithm design to illustrate synchronization issues and techniques for resolving them. It was originally formulated in 1965 by <a href="https://en.wikipedia.org/wiki/Edsger_W._Dijkstra">Edsger Dijkstra</a> as an exam problem.</p>
+</blockquote>
+<pre class="hljs"><code><div>                    .─.                THE SETUP:   
+                   (   ) Plato            - A circular table,
+                    `─'                   - N philosophers (N &gt;= 2), 
+       ┌──────────────────────────┐       - N forks, each placed between
+       │  \       ┌────┐       /  │         two adjacent philosophers,
+       │   \      │bowl│      /   │       - M meals for each philosopher,
+       │          └────┘          │       - Each philosopher needs 2     
+       │       ┌──────────┐       │           adjacent forks to eat
+ .─.   │┌────┐ │          │ ┌────┐│   .─.     spaghetti (yeah, weirdos),
+(   )  ││bowl│ │spaghetti │ │bowl││  (   )    otherwise he philosophizes.
+ `─'   │└────┘ │          │ └────┘│   `─'     
+Hegel  │       └──────────┘       │ Descartes  
+       │          ┌────┐          │            
+       │   /      │bowl│      \   │     THE PROBLEM:  
+       │  /       └────┘       \  │       How should each philosopher
+       └──────────────────────────┘       behave so no one starves  
+                    .─.                   i.e. each one is able to
+ N = 4 here, but   (   ) Rousseau         eat M times?
+ We use N = 5 below `─'                                    
+</div></code></pre>
+<ul>
+<li>Note that we will assume <code>N</code> = 5 and <code>M</code> = 3. That is, 5 philosophers, 5 forks, 3 meals for each.</li>
+</ul>
+<h3 id="351-version-1-deadlock-happens-with-nonzero-probability">3.5.1 Version 1: deadlock happens with nonzero probability</h3>
+<ul>
+<li>The most naïve approach is simply having N forks represented by N locks, and having each philosopher lock the fork before using and unlock it afterwards. There is no race for the fork here, since each fork has a lock on it, but there is another problem.</li>
+</ul>
+<p>Let's look at the code first.</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Verion 1: deadlock may happen */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> kNumPhilosophers = <span class="hljs-number">5</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> kNumForks = kNumPhilosophers;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> kNumMeals = <span class="hljs-number">3</span>;
+
+<span class="hljs-comment">/* forks modeled as mutexes */</span>
+<span class="hljs-keyword">static</span> mutex forks[kNumForks];
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">think</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> id)</span> </span>{
+  <span class="hljs-built_in">cout</span> &lt;&lt; oslock &lt;&lt; id &lt;&lt; <span class="hljs-string">" starts thinking."</span> &lt;&lt; <span class="hljs-built_in">endl</span> &lt;&lt; osunlock;
+  sleep_for(getThinkTime()<span class="hljs-comment">/* random number, not important here */</span>);
+  <span class="hljs-built_in">cout</span> &lt;&lt; oslock &lt;&lt; id &lt;&lt; <span class="hljs-string">" all done thinking. "</span> &lt;&lt; <span class="hljs-built_in">endl</span> &lt;&lt; osunlock;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">eat</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> id)</span> </span>{
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> left = id;
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> right = (id + <span class="hljs-number">1</span>) % kNumForks;
+
+  forks[left].lock();    <span class="hljs-comment">/* lock, if already locked, then wait */</span>
+  forks[right].lock();   <span class="hljs-comment">/* lock, if already locked, then wait */</span>
+
+  <span class="hljs-built_in">cout</span> &lt;&lt; oslock &lt;&lt; id &lt;&lt; <span class="hljs-string">" starts eating."</span> &lt;&lt; <span class="hljs-built_in">endl</span> &lt;&lt; osunlock;
+  sleep_for(getEatTime());
+  <span class="hljs-built_in">cout</span> &lt;&lt; oslock &lt;&lt; id &lt;&lt; <span class="hljs-string">" done eating."</span> &lt;&lt; <span class="hljs-built_in">endl</span> &lt;&lt; osunlock;
+
+  forks[left].unlock();  <span class="hljs-comment">/* unlock */</span>
+  forks[right].unlock(); <span class="hljs-comment">/* unlock */</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">philosopher</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> id)</span> </span>{
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; kNumMeals; i++) {
+    think(id);
+    eat(id);
+  }
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  thread philosophers[kNumPhilosophers];
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; kNumPhilosophers; i++) 
+    philosophers[i] = thread(philosopher, i);
+  <span class="hljs-keyword">for</span> (thread&amp; p: philosophers)
+    p.join();
+
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<ul>
+<li>What's the problem?
+<ul>
+<li><strong>each</strong> philosopher emerges from his deep thinking, successfully grabs the fork to his left, and then gets pulled off the processor because his time slice is over.</li>
+<li>If this pathological scheduling pattern presents itself, eventually all each philosopher will be not able to grab the fork on his right, as that fork is already locked by the philosopher on his right.</li>
+<li>That will leave the program in a state where all threads are entrenched in a state of <em>deadlock</em>, because each philosopher is stuck waiting for the philosopher on his right to let go of his fork.</li>
+<li>The probability of this happening increases there is a sleep between locking the left fork and the right, as a thread switch will most likely happen during this sleep period.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>A <em>deadlock</em> is a situation in which two or more competing actions are each waiting for the other to finish, and thus neither ever does.<br>If a race condition happens, the program can still proceed (though potentially with erroneous results), but if a deadlock happens, the program falls into a never-ending wait, like an obscure while-true loop.</p>
+</blockquote>
+<ul>
+<li>The solution, however, might not be intuitive. Solutions are many; one heuristic, to prevent the deadlock from happening, is to introduce the notion of <em>permission slip</em>s (这就是“条子”，哈哈哈), or <em>permit</em>s.</li>
+</ul>
+<h3 id="352-version-2-permission-slips-limit-the-number-of-bidding-threads">3.5.2 Version 2: permission slips, limit the number of bidding threads</h3>
+<ul>
+<li>Deadlock can be programmatically prevented by implanting directives to limit the number of threads that try to participate in an action that could otherwise result in deadlock.
+<ul>
+<li>
+<p>(1) We could, for instance, recognize that it's impossible for 3 or more philosophers to be eating at the same time, via a simple pigeonhole principle argument (e.g. 3 philosophers can be eating at the same time if and only if there are 6 forks, and there are not). We can, therefore, limit the number of philosophers grabbing forks to 2.</p>
+<blockquote>
+<p>Multithreading purists may criticize that this approach, by limiting the number of participating threads from 5 to 2, sacrifices the power of multithreading too much.</p>
+</blockquote>
+</li>
+<li>
+<p>(2) We can also argue that it's okay to let up to 4 (but not all 5) philosophers to transition into the <code>eat()</code> function of their think-eat cycle, knowing that at least one will succeed in grabbing both forks. That is, we allow up to 4 philosophers to take part in the bid for forks at the same time.</p>
+<blockquote>
+<p>We will take this approach, as this approach downsize the number of threads that are allowed to grab fork from 5 to 4, not from 5 to 2, so it lets all threads to make as much progress as possible.</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Version 2: no bug, but has busy-waiting */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> kNumPhilosophers = <span class="hljs-number">5</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> kNumForks = kNumPhilosophers;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> kNumMeals = <span class="hljs-number">3</span>;
+
+<span class="hljs-comment">/* forks modeled as mutexes -- to solve the race condition */</span>
+<span class="hljs-keyword">static</span> mutex forks[kNumForks]; 
+
+<span class="hljs-comment">/* impose limit on # bidding threads -- to solve the deadlock */</span>
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> numAllowed = kNumPhilosophers - <span class="hljs-number">1</span>;
+<span class="hljs-comment">/* the lock partnered with numAllowd */</span>
+<span class="hljs-keyword">static</span> mutex numAllowedLock;
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">think</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> id)</span> </span>{
+  <span class="hljs-comment">/* same as in 3.5.1 */</span>
+}
+
+<span class="hljs-comment">/* wait to get a permission slip to participate in the bid for forks */</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">waitForPermission</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    numAllowedLock.lock();
+    <span class="hljs-keyword">if</span> (numAllowed &gt; <span class="hljs-number">0</span>) <span class="hljs-keyword">break</span>;
+    numAllowedLock.unlock();
+    sleep_for(<span class="hljs-number">10</span>);
+  }
+  numAllowed--;
+  numAllowedLock.unlock();
+}
+
+<span class="hljs-comment">/* give back the permission slip to the pool so others can participate */</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">grantPermission</span><span class="hljs-params">()</span> </span>{
+  numAllowedLock.lock();
+  numAllowed++;
+  numAllowedLock.unlock();
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">eat</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> id)</span> </span>{
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> left = id;
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> right = (id + <span class="hljs-number">1</span>) % kNumForks;
+
+  waitForPermission(); <span class="hljs-comment">/* wait for permission until get one */</span>
+
+  forks[left].lock();  <span class="hljs-comment">/* may wait here */</span>
+  forks[right].lock(); <span class="hljs-comment">/* may wait here */</span>
+
+  <span class="hljs-built_in">cout</span> &lt;&lt; oslock &lt;&lt; id &lt;&lt; <span class="hljs-string">" starts eating."</span> &lt;&lt; <span class="hljs-built_in">endl</span> &lt;&lt; osunlock;
+  sleep_for(getEatTime());
+  <span class="hljs-built_in">cout</span> &lt;&lt; oslock &lt;&lt; id &lt;&lt; <span class="hljs-string">" all done eating."</span> &lt;&lt; <span class="hljs-built_in">endl</span> &lt;&lt; osunlock;
+
+  grantPermission(); <span class="hljs-comment">/* give back the permission to the pool */</span>
+
+  forks[left].unlock();
+  forks[right].unlock();
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">philosopher</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> id)</span> </span>{
+  <span class="hljs-comment">/* same as in 3.5.1 */</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-comment">/* same as in 3.5.1 */</span>
+}   
+</div></code></pre>
+<ul>
+<li>It solves the problem of deadlock. It does, however, have one design flaw: the solution uses busy waiting in <code>waitForPermission()</code>, which is usually a big no-no. In this function,
+<ul>
+<li>The philosopher thread continually poll the value of <code>numAllowed</code> until the value is positive. At that point, decrement it to emulate the consumption of a shared resource — in this case, a permission slip allowing a philosopher to start trying to grab forks.</li>
+<li>Since there are multiple threads potentially examining and decrementing <code>numAllowed</code>, identify the critical region as one that needs to be guarded by a <code>mutex</code>. And if the philosopher notices the value of <code>numAllowed</code> is 0 (i.e. all permissions slips are out), then release the lock and yield the processor to some other philosopher thread who can actually do some useful work.</li>
+<li>The above solution uses <em>busy waiting</em>, which is a concurrency jargon used when a thread periodically checks to see whether some condition has changed so it can move on to do more meaningful work.</li>
+<li>The problem with busy waiting, in most situations, is that the busy-waiting thread <strong>occupies the CPU during its time windows, wasting the CPU time</strong>, which would be better spent to ensure other threads — who presumably have meaningful work — to proceed.</li>
+</ul>
+</li>
+<li>A better solution: if a philosopher doesn't have permission to advance (i.e. <code>numAllowed</code> is confirmed to be zero), then that thread should be <strong>put to sleep indefinitely</strong> until some other thread sees a reason to <strong>wake it up</strong>. In this example, another philosopher thread, after it increments <code>numAllowed</code> within <code>grantPermission()</code>, could notify the indefinitely blocked thread that some permissions slips are now available.</li>
+</ul>
+<h3 id="353-version-3-improve-the-solution-no-busy-waiting">3.5.3 Version 3: improve the solution - no busy-waiting</h3>
+<ul>
+<li>We can get rid of the busy-waiting situation by putting the thread into <strong>sleep</strong> and having another thread <strong>wake it up</strong> when some condition is met.</li>
+<li>Implementing this idea requires a more sophisticated concurrency directive that supports a different form of thread communication. Fortunately, C++11 provides a standard, albeit difficult-to-understand, class called the <code>condition_variable_any</code>.</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Version 3: no bug, no busy-waiting */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> kNumPhilosophers = <span class="hljs-number">5</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> kNumForks = kNumPhilosophers;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> kNumMeals = <span class="hljs-number">3</span>;
+
+<span class="hljs-comment">/* forks modeled as mutexes -- to solve the race condition */</span>
+<span class="hljs-keyword">static</span> mutex forks[kNumForks];
+
+<span class="hljs-comment">/* impose limit on # bidding threads -- to solve the deadlock */</span>
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> numAllowed = kNumPhilosophers - <span class="hljs-number">1</span>;
+<span class="hljs-comment">/* the lock meant to protect numAllowed against ++, -- */</span>
+<span class="hljs-keyword">static</span> mutex numAllowedLock;
+
+<span class="hljs-comment">/* to solve the busy-wait introduced in 3.5.2 */</span>
+<span class="hljs-keyword">static</span> condition_variable_any cv;
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">think</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> id)</span> </span>{
+  <span class="hljs-comment">/* same as in 3.5.1 */</span>
+}
+
+<span class="hljs-comment">/* wait to get a permission slip to participate in the bid for forks */</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">waitForPermission</span><span class="hljs-params">()</span> </span>{
+  lock_guard&lt;mutex&gt; lg(numAllowedLock);
+
+  <span class="hljs-comment">/* test: if condition is met: proceed
+           otherwise: release lock, sleep &amp; wait
+     notified: re-acquire lock, re-test
+   */</span>
+  cv.wait(numAllowedLock, []{ <span class="hljs-keyword">return</span> numAllowed &gt; <span class="hljs-number">0</span>; });
+
+  numAllowed--;
+}
+
+<span class="hljs-comment">/* give back the permission slip to the pool so others can participate */</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">grantPermission</span><span class="hljs-params">()</span> </span>{
+  lock_guard&lt;mutex&gt; lg(numAllowedLock);
+  numAllowed++;
+  <span class="hljs-keyword">if</span> (numAllowed == <span class="hljs-number">1</span>) { <span class="hljs-comment">/* if numAllowed goes from 0 to 1 */</span>
+      <span class="hljs-comment">/* notify cv to re-test the sleeping threads' condition */</span>
+      cv.notify_all();
+  }
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">eat</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> id)</span> </span>{
+  <span class="hljs-comment">/* same as in 3.5.2 */</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">philosopher</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">int</span> id)</span> </span>{
+  <span class="hljs-comment">/* same as in 3.5.1 and 3.5.2 */</span>
+  <span class="hljs-comment">/* 1. wait for permission until get one,
+     2. lock both forks (may wait here),
+     3. enjoy the spaghetti,
+     4. give back the permission to the pool,
+     5. unlock both forks */</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-comment">/* same as in 3.5.1 and 3.5.2 */</span>
+} 
+</div></code></pre>
+<ul>
+<li>The <code>condition_variable_any</code> (abbreviated as &quot;cva&quot; below) is the core concurrency directive that can preempt and block a thread until some condition is met.</li>
+<li>In this example, the philosopher seeking permission to eat waits indefinitely until some condition is met (unless the condition is met already, in which case it doesn't need to wait), by calling <code>cva::wait()</code>.
+<ul>
+<li>If <code>numAllowed</code> is positive at the moment wait is called, then it returns immediately without blocking.</li>
+<li>If <code>numAllowed</code> is zero at the moment <code>cva::wait()</code> is called, then the calling thread is <strong>pulled off the CPU, marked as blocked</strong> until the thread manager is informed (by another thread) that the value of <code>numAllowed</code> has changed.</li>
+</ul>
+</li>
+<li>In this example, the philosopher just finishing up a meal increments <code>numAllowed</code>, and if the value of <code>numAllowed</code> goes from 0 to 1, the same philosopher signals (via <code>cva::notify_all()</code>) all threads blocked by <code>cva</code> that a meaningful update has occurred. That prompts the thread manager to reexamine the condition on behalf of all threads blocked by <code>cva::wait()</code>, and potentially allow one or more of them to emerge from their long nap and move on to the work they weren't allowed to move on to before.</li>
+<li>Because <code>numAllowed</code> is being examined and potentially changed concurrently by many threads, and because a condition framed in terms of it (that is, <code>numAllowed &gt; 0</code>) influences whether a thread blocks or continues uninterrupted, we still need a traditional <code>mutex</code> here so that competing threads can lock down <strong>exclusive access</strong> to <code>numAllowed</code>.</li>
+<li>Before <code>cva::wait()</code> is called, the the supplied <code>mutex</code> lock should have been lock already. If <code>cva::wait()</code> notices that the supplied condition isn't met, the <code>cva</code> object puts the current thread to <strong>sleep</strong> indefinitely and <strong>automatically release</strong>s the lock. When the <code>cva</code> object is notified and a waiting thread is switched back on CPU, it <strong>automatically re-acquire</strong>s the <code>mutex</code> lock which it released just prior to sleeping, and <strong>re-evaluate the condition</strong> for that thread. If the condition is met, then the thread proceeds to the following lines; otherwise, it automatically releases the lock again and put the thread back in sleep, and then waits for another notification.
+<blockquote>
+<p>This is KOB.</p>
+</blockquote>
+</li>
+</ul>
+<pre class="hljs"><code><div>First call (lock should be locked already)
+          │
+          ▼          ┌───────────────┐
+          ├◀─success─┤re-acquire lock◀────┐  sleep: blocked (off CPU)
+          │          └──┬───────▲────┘    │         &amp; wait for an event
+ ┌────────▼───────┐    fail    lock       │         of interest
+ │   condition?   │     │    available    │
+ └────────┬───────┘   ┌─▼───────┴─┐       │
+          ├──false──┐ │   sleep   │       │
+          │         │ └───────────┘       │
+          │  ┌──────▼─────┐               │
+        true │release lock│               │
+          │  └──────┬─────┘         notification &lt;= notify_all()
+          │  ┌──────▼─────┐               │
+          │  │   sleep    │───────────────┘
+          │  └────────────┘
+┌─────────▼─────────┐
+│ continue to hold  │
+│  lock &amp; proceed   │     FLOWCHART:
+└─────────┬─────────┘     void wait(Lock &amp;lock, Predicate condition); 
+          ▼                                     
+</div></code></pre>
+<ul>
+<li>
+<p><code>codition_variable_any</code> class in summary:</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* constructor */</span>
+condition_variable_any();
+
+<span class="hljs-comment">/* wait: blocks the current thread 
+   until the condition variable is woken up */</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> Lock, <span class="hljs-keyword">typename</span> Predicate&gt; 
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">wait</span><span class="hljs-params">(Lock &amp;lock, Predicate condition)</span></span>;
+
+<span class="hljs-comment">/* notify all threads blocked by cva */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">notify_all</span><span class="hljs-params">()</span></span>;
+
+<span class="hljs-comment">/* other methods... */</span>
+</div></code></pre>
+<ul>
+<li>Predicate: a function that returns a boolean. You can pass in a function pointer to a predicate, or pass in a <a href="https://msdn.microsoft.com/en-us/library/dd293608.aspx">lambda expression</a> that is a predicate. If the predicate returns <code>false</code>, then <code>cva::wait()</code> puts the calling thread into sleep.</li>
+</ul>
+<blockquote>
+<p>You should avoid using the one-argument version of <code>wait()</code>, which takes the lock as the only argument, because this version of <code>wait()</code> sometimes returns without being notified - &quot;<a href="https://www.justsoftwaresolutions.co.uk/threading/condition-variable-spurious-wakes.html">spurious wake</a>&quot;.</p>
+</blockquote>
+</li>
+<li>
+<p>The <code>lock_guard</code> class exists to <strong>automate the locking and unlocking of a</strong> <code>mutex</code>.</p>
+<ul>
+<li>The <code>lock_guard()</code> constructor binds an internal reference to the supplied <code>mutex</code> object and calls <code>lock()</code> on it (if the <code>mutex</code> lock is already locked by another thread, the constructor is blocked inside, until the lock is released).</li>
+<li>The <code>~lock_guard()</code> destructor releases the lock on the same <code>mutex</code> object.</li>
+<li>The overall effect: the code section from the constructor being called to the destructor being called (often implicitly at function return or exception throwing) is marked as a <code>mutex</code>-protected critical region.</li>
+</ul>
+<pre class="hljs"><code><div>{                          {
+  ...                        ...
+  m.lock();                  lock_guard&lt;mutex&gt; lg(m); <span class="hljs-comment">/* lock m */</span>
+  do_something();   &lt;=&gt;      do_something();
+  m.unlock();              } <span class="hljs-comment">/* the destructor unlocks m */</span>
+}                                  
+</div></code></pre>
+<blockquote>
+<p>SIDE NOTE:<br>Java: <code>lock_guard</code> is C++ STL's answer to Java keyword <code>synchronized</code>.</p>
+</blockquote>
+<blockquote>
+<p>SIDE NOTE:<br>The <code>lock_guard</code> is a template class, because other than <code>mutex</code> class, some other classes like <code>recursive_mutex</code> and <code>timed_mutex</code> have such <code>lock()</code> and <code>unlock()</code> methods, too.</p>
+</blockquote>
+<p>Its prototype is</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* template declaration */</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> BasicLockable&gt; lass lock_guard;
+
+<span class="hljs-comment">/* constructor (the basic one) */</span>
+<span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">lock_guard</span><span class="hljs-params">(BasicLockable &amp;m)</span></span>;
+
+<span class="hljs-comment">/* destructor */</span>
+~lock_guard();
+</div></code></pre>
+</li>
+<li>
+<p>A pedendic note: to let the other threads to proceed as much as they can, in the <code>eat()</code> function, you can place <code>grantPermission();</code> immediately after successfully locking the left and right forks, since now that the thread succeeded in locking the two forks already, there is no reason to continue to hold the permission slip - it can give the slip back to the pool, knowing that another thread may grab the slip and try to lock forks.</p>
+<blockquote>
+<p>Placing <code>grantPermission();</code> after unlocking the forks is acceptable as well, but it has the opposite effect - it further delays the progress of other threads.</p>
+</blockquote>
+</li>
+<li>
+<p>Another pedendic note: the global variable <code>numAllowed</code>, i.e. the number of available permission slips, keeps track of the bidding situation of a resource that is at premium - like the forks, which is fewer than the dining philosopher threads, or network connections, or database access, ...</p>
+</li>
+</ul>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

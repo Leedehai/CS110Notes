@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Filesys (2)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-1-filesystem-2">Topic 1 Filesystem (2)</h1>
+<div id="author-signature">Leedehai</div>
+Friday, April 07, 2017<br>
+Monday, April 10, 2017
+<h2 id="24-filesystems">2.4 Filesystems</h2>
+<h3 id="241-an-overview">2.4.1 An overview</h3>
+<p>We assume the storage device is a local hard drive here, for simplicity.</p>
+<ul>
+<li>A hard drive, be it a magnetic tape, a HHD, or a SSD, is conceptually segmented in linear <em>sector</em>s, or <em>block</em>s, of a fixed size (e.g. 512 B), and those sectors are indexed: 0, 1, 2, ... sectors are accessed by their indecies.</li>
+<li>Sector is the smallest unit for read and write operations. It is a trade-off for space efficiency and I/O speed (typically measured in MB/s), and sequential I/O is much faster than random I/O for an HHD.</li>
+<li>A file might occupy one or more sectors. A sector is occupied by at most one file.</li>
+<li>If a file occupies multiple sectors, those sectors might not be consecutive or in order.</li>
+</ul>
+<p>Inode.</p>
+<ul>
+<li>A file's metadata, including its owner, type, access permission, size, create time, the sector numbers of sectors in which the file's payload resides in, can be accessed by a data structure stored on disk, called inode (the &quot;i&quot; stands for &quot;index&quot;). Note that the file's own name is NOT stored in its inode, but in its directory file's payload.</li>
+<li>A file has one and only one inode.</li>
+<li>A file's &quot;size&quot; refers to the file's payload size, without its inode.</li>
+<li>Apart from <em>regular file</em>s, a <em>directory</em> is also a type of file and has its own inode.</li>
+<li>An inode has a fixed size, typically implemented as a <code>struct</code> type in C/C++.</li>
+<li>Inodes are stored in a dedicated part on the disk, referred to as the <em>inode table</em>. A sector can contain multiple inodes.</li>
+<li>An inode instance is stored on disk, while a vnode instance is stored in memory and maintained by the OS kernel.</li>
+</ul>
+<p>We will use <a href="https://en.wikipedia.org/wiki/Version_6_Unix">Unix v6</a> filesystem (1975) as an example to elaborate how filesystems work.</p>
+<h3 id="242-layering-for-the-unix-filesystem">2.4.2 Layering for the Unix filesystem</h3>
+<ul>
+<li>A program can create a file with a user-chosen name, read and write the file's content (<em>payload</em>), and set and get the file's metadata (owner, type, access permission, last modification time, ...). Files can be organized into directories with user-chosen names, forming a <em>naming network</em>. File hierarchies in different storage devices can be grafted together (&quot;mount&quot;) to from a even larger hierarchy.</li>
+<li>To support these operations, Unix filesystem provides many APIs, including <code>open()</code>, <code>read()</code>, <code>write()</code>, <code>close()</code>, <code>mkdir()</code>, <code>mount()</code>, etc.</li>
+<li>To implement these APIs, the designer employed the strategy of layering. The filesystem makes use of several hidden layers which bridge machine-oriented names (i.e. addresses) to user-friendly names (i.e. character strings).</li>
+</ul>
+<blockquote>
+<p><em>Layering</em>: As a form of modularity, layering is a basic idea to design large-scale systems. Apart from filesystems, the implementation of compilers uses the same strategy. That is, break down the entire task into many layers (or steps) and tackle them individually. The design of <a href="https://en.wikipedia.org/wiki/OSI_model">internet layers</a> also uses the same idea. <br> Pictorially, though layers are stacked vertically and steps are aligned horizontally to form a pipeline, the ideas are essentially the same.</p>
+</blockquote>
+<pre class="hljs"><code><div>                     USER
+          ┌────────────────────────┐
+        ▲ │  Symbolic Link Layer   │ pathname ▶ pathname
+        │ ├────────────────────────┤
+user    │ │Absolute Path Name Layer│ absolute pathname ▶ inode#
+friendly│ ├────────────────────────┤
+        ▼ │    Path Name Layer     │ pathname ▶ inode#
+          ├────────────────────────┤
+interface │    File Name Layer     │ file name ▶ inode#
+          ├────────────────────────┤
+        ▲ │   Inode Number Layer   │ inode# ▶ inode
+machine │ ├────────────────────────┤
+friendly│ │       File Layer       │ index# ▶ block# (blocks form a file)
+        │ ├────────────────────────┤
+        ▼ │      Block Layer       │ block# ▶ block data
+          └────────────────────────┘
+                    MACHINE
+</div></code></pre>
+<h3 id="243-the-layers-explained">2.4.3 The layers explained</h3>
+<h4 id="2431-the-block-layer">2.4.3.1 The block layer</h4>
+<ul>
+<li>
+<p>Storage devices are conceptually segmented into <em>block</em>s, or <em>sector</em>s, of a fixed size (typically 512B). A block is the smallest unit to be operated by the filesystem.</p>
+<blockquote>
+<p>If the sector size is too small, the overhead to keep track of free and allocated blocks increases; if too large, it may waste space.</p>
+</blockquote>
+<blockquote>
+<p>Technically, a <em>block</em> is a software abstraction of a physical <em>sector</em> in the device. For us, they are the same.</p>
+</blockquote>
+</li>
+<li>
+<p>The name of a block is a number, which belongs to a compact set of integers, typically indicating the offset from the device's beginning.</p>
+</li>
+<li>
+<p>The <strong>name-mapping algorithm</strong> for a block is simple: it takes as input a block number, and returns the block content (each bit's value).</p>
+</li>
+<li>
+<p>The storage device istself may employ some block-managing mechanism under the hood, e.g. handling bad blocks.</p>
+</li>
+<li>
+<p><strong>Name discovery</strong>: the filesystem starts with a <em>super block</em>, which has a well-known name (<code>1</code>). The super block serves as an anchor for the information that keeps track of which blocks are in use and which are available for assignment.</p>
+<blockquote>
+<p>Different implementations of Unix may use different representations for the list of free blocks. A possible layout is like this:</p>
+</blockquote>
+<pre class="hljs"><code><div> 0       1       2                                          n-1
+┌───────┬───────┬───────────┬─────────────┬────────────────────┐
+│ Boot  │ Super │ Bitmap of │    Inode    │     Payload        │
+│ block │ block │free blocks│    table    │  ... blocks ...    │
+└───────┴───────┴───────────┴─────────────┴────────────────────┘
+</div></code></pre>
+<p>(Boot block: stores a program that starts the OS)</p>
+</li>
+</ul>
+<h4 id="2432-the-file-layer-kob">2.4.3.2 The file layer (KOB)</h4>
+<ul>
+<li>The user's stuff may exceed the size of block (e.g. 512 B) and may grow or shrink over time. To support this, a file layer is introduced. A file is essentially a linear array of bytes.</li>
+<li>The filesystem uses <em>inode</em> as container to record which blocks belong to each file. Together with some other metadata about a file, an <code>inode</code> can be implemented like this:</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-keyword">struct</span> inode { <span class="hljs-comment">/* one instance for a file */</span>
+  <span class="hljs-keyword">int</span> block_numbers[N]; <span class="hljs-comment">/* N = 8 */</span>
+  <span class="hljs-keyword">int</span> fileSize_in_bytes;
+  <span class="hljs-keyword">int</span> type; <span class="hljs-comment">/* regular file, directory file, or symbolic link file */</span>
+  ... <span class="hljs-comment">/* other metadata */</span>
+}
+</div></code></pre>
+<pre class="hljs"><code><div> ◀────────────── Inode table ─────────────────▶   
+          ◀─ block ──▶                                            
+┌─────────┬──┬──┬────┬───────────────────────┐ 
+│         │  │██│    │                       │  
+└─────────┴──┴──┴────┴───────────────────────┘                          
+  ┌────────────┴──────────────────┐                     
+  ◇                               ◇            
+  ┌───────────────────────────────┐            
+  │Inode                          │            
+  │                               │            
+  │ type: regular file            │    Note: an inode just occupies
+  │ permission: rwxr-x--x         │    a sliver of a block.       
+  │ owner ID: Leedehai            │            
+  │ reference count: 1            │    (You can examine inode's        
+  │ last modification time: ..    │     content using shell        
+  │ ...                           │     command &quot;stat&quot;)
+  │         index=0 1 ...       7 │            
+  │ block numbers┌─┬─┬─┬─┬─┬─┬─┬─┐│            
+  │              └─┴─┴─┴─┴─┴─┴─┴─┘│            
+  └───────────────────────────────┘            
+</div></code></pre>
+<ul>
+<li>The blocks occupoed by a file may or may not be consecutive or in order. Picking which block to store data is the task of the storage device's software implementation.</li>
+<li>The <strong>name-mapping algorithm (for small files)</strong>: it takes as input an inode instance (typically a pointer to the inode instance) and an block index integer (<code>0</code>,...,<code>N-1</code>), and returns the block number.</li>
+</ul>
+<pre class="hljs"><code><div>                          ┌─┬─┬───┐                
+                          │ │█│   │  Inode (inside an  
+                          └─┴┬┴───┘    inode block)     
+                    ┌────────┴┬───────────────┐        
+                    ▼ 1       ▼ 2             ▼ 8       
+                ┏━━━━━━━┓ ┏━━━━━━━┓       ┏━━━━━━━┓    
+                ┃payload┃ ┃payload┃  ...  ┃payload┃    
+                ┃ block ┃ ┃ block ┃       ┃ block ┃    
+                ┗━━━━━━━┛ ┗━━━━━━━┛       ┗━━━━━━━┛
+Note: an inode just occupies a sliver of a block.
+</div></code></pre>
+<ul>
+<li>The <strong>name-mapping algorithm (for large files)</strong>: if a file spans across more than <code>N</code> (=8) blocks, the filesystem uses a more sophisticated mechanism to store the block numbers: the first <code>N-1</code>(=7) blocks are <em>indirect block</em>s. They do not contain payload data, but block numbers (if a block is 512B in size, a block number is 2B, then this block contains 512/2=256 block numbers). The last block, i.e. the <code>N-1</code>th (=8th), is a <em>doubly indirect block</em>, namely, the block that contain block numbers of indirect blocks. With this design, a file's payload data can be of <code>(N-1)x(512/2)+1x(512/2)x(512/2)</code> bytes. When <code>N</code>=8, it is about 32MB.
+<blockquote>
+<p>* &quot;Indirect&quot; blocks: blocks that reside in payload block area on the disk, but does not actually contain payload data. Instead, they contain block numbers.<br></p>
+</blockquote>
+<ul>
+<li>&quot;Direct&quot; blocks: blocks that actually contain payload data.<br></li>
+<li>For large files, their payload blocks' numbers are <strong>not</strong> all stored in the inode table area on the disk.</li>
+</ul>
+</li>
+</ul>
+<pre class="hljs"><code><div>                   ┌─┬─┬───┐                             
+                   │ │█│   │  Inode (inside an          
+                   └─┴┬┴───┘    inode block)             
+             ┌────────┴┬───────────────┬─────────────┐    
+             ▼ 1       ▼ 2             ▼ 7           ▼ 8      
+         ┌───────┐ ┌───────┐       ┌───────┐     ┌───────┐  
+         │ indi. │ │ indi. │  ...  │ indi. │     │d.indi.│  
+         │ block │ │ block │       │ block │     │ block │   
+         └───┬───┘ └───────┘       └───┬───┘     └───┬───┘   
+    ┌────────┴────┐              ... ──┴───┐         ├────────────┐ 
+    ▼   1...256   ▼                        ▼ 256     ▼   1...256  ▼  
+┏━━━━━━━┓     ┏━━━━━━━┓                ┏━━━━━━━┓ ┌───────┐    ┌───────┐
+┃payload┃ ... ┃payload┃                ┃payload┃ │ indi. │    │ indi. │
+┃ block ┃     ┃ block ┃ ...  ...  ...  ┃ block ┃ │ block │ .. │ block │
+┗━━━━━━━┛     ┗━━━━━━━┛                ┗━━━━━━━┛ └───┬───┘    └───┬───┘
+    1            256                   ┌─────────────┤       ... ─┴┐    
+                                       ▼   1...256   ▼             ▼ 256
+                                   ┏━━━━━━━┓     ┏━━━━━━━┓     ┏━━━━━━━┓
+                                   ┃payload┃ ... ┃payload┃ ... ┃payload┃
+                                   ┃ block ┃     ┃ block ┃     ┃ block ┃
+                                   ┗━━━━━━━┛     ┗━━━━━━━┛     ┗━━━━━━━┛
+Note: - an inode just occupies a sliver of a block.
+      - suppose a (doubly) idirect block can store 256 block numbers.
+</div></code></pre>
+<h4 id="2443-the-inode-number-layer">2.4.4.3 The inode number layer</h4>
+<ul>
+<li>The filesystem names each inode instance by an inode number, which belongs to a compact set of integer.</li>
+<li>The <strong>name-mapping algorithm</strong> takes in an inode number and returns an inode instance from the inode table.</li>
+<li><strong>Name discovery</strong>: this layer is responsible for keeping track of which inode numbers are in use and which are free.
+<blockquote>
+<p>Different implementations of Unix may use different representations for the list of free inode numbers.</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="2444-the-file-name-layer-the-machine-user-interface-of-the-filesystem">2.4.4.4 The file name layer (the machine-user interface of the filesystem)</h4>
+<ul>
+<li>The inode number is the internal representation of a file, but is inconvenient for human beings.</li>
+<li>To create a file, the file system allocates an inode (inside a block in the inode table area on disk), initializes its metadata, and <strong>binds the proposed file name to that inode in some directory file</strong>.
+<blockquote>
+<p>You see, the file's name string is <strong>not</strong> in this file's inode or payload data, but <strong>in the payload data of the directory</strong> in which this file resides.</p>
+</blockquote>
+</li>
+<li>By default, newly-created files are added to the working directory. The current working directory is indicated by by an inode number <code>cwd</code>, which is maintained by the kernel by the environment variable <code>PWD</code>. System call <code>chdir()</code> can allow a process to set this varible and change working directory.
+<blockquote>
+<p><em>Environment variable</em>s (introduced by Unix version 7 in 1979) are a set of dynamic named values that can affect the way running processes will behave on a computer. They are part of the environment in which a process runs. <br>
+For example, a running process can query the value of the <code>TEMP</code> environment variable to discover a suitable location to store temporary files, or the <code>HOME</code> or <code>USERPROFILE</code> variable to find the home or profile directory owned by the user running the process.</p>
+</blockquote>
+</li>
+<li>In Unix, <strong>a directory is also a file</strong>, whose <strong>payload data is a map</strong> that maps file names to the corresponding inode numbers. System call <code>mkdir()</code> creates a zero-length directory file and sets the inode data of that file. When new files (be they regular files, directories, or else) are added to this directory, the (file name, inode number) pair is written into this directory file's payload data.
+<blockquote>
+<p>Reiterated, a file's name string is <strong>not</strong> in this file's inode or payload data, but <strong>in the payload data of the directory</strong> in which this file resides.<br> But to determine a file's type, you have to dive into that file's inode data.</p>
+</blockquote>
+</li>
+</ul>
+<pre class="hljs"><code><div>    CS110 (directory)                                                         
+    ├─ Syllabus.txt (regular file)                                                    
+    └─ Homeworks (directory)                                                     
+       ├─ HW1 (directory)
+       └─ HowToSubmit.txt (regular file)
+     inode 1001                                                     
+     (CS110's inode)            block 9105                         
+    ─┌───────────────┬ ─        ┌──────────────────────────────────┐
+     │type: dir.     │          │                                  │
+     │permission:..  │          │&quot;Syllabus.txt&quot;: inode 2007        │─ ┐
+     │ref cnt:..     │─────────▶│&quot;Homeworks&quot;:  inode 2011          │   
+     │block#: 9105   │          │                                  │  │
+    ─└───────────────┴ ─        └──────────────────────────────────┘   
+┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+│                               block 9397                                    
+     inode 2007                 ┌──────────────────────────────────┐
+│    (Syllabus.txt's inode)     │                                  │
+    ─┌───────────────┬ ─     ┌─▶│Content..                         │
+│    │type: reg.     │       │  │                                  │
+     │permission:..  │       │  └──────────────────────────────────┘
+├ ─▷ │ref cnt:..     │───────┤  block 9395                                    
+     │block#: 9397,  │       │  ┌──────────────────────────────────┐
+│    │        9395   │       │  │                                  │
+    ─└───────────────┴ ─     └─▶│Content..                         │
+│                               │                                  │
+      inode 2011                └──────────────────────────────────┘
+│     (Homework's inode)        block 9301                         
+    ─┌───────────────┬ ─        ┌──────────────────────────────────┐
+│    │type: dir.     │          │                                  │
+     │permission:..  │          │&quot;HW1&quot;: inode 1015                 │
+└ ─▷ │ref cnt:..     │─────────▶│&quot;HowToSubmit.txt&quot;: inode 1070     │
+     │block#: 9301   │          │                                  │
+    ─└───────────────┴ ─        └──────────────────────────────────┘
+</div></code></pre>
+<h4 id="2445-the-path-name-layer-the-absolute-path-name-layer">2.4.4.5 The path name layer &amp; the absolute path name layer.</h4>
+<ul>
+<li>A file's path are organized in the form of &quot;a/b/c&quot; string. Unix uses a recursive procedure to resolve the file's path.</li>
+<li>A absolute path starts from the root directory <code>/</code>, and has the form of &quot;/a/b/c&quot; (the leading &quot;/&quot; indicates the root directory). The root directory's inode number is <code>1</code> (the first inode; note that inode number starts from number 1, not 0).</li>
+</ul>
+<blockquote>
+<p>Similar heirarchical mechanism is utilized in internet's domain name resolution.</p>
+</blockquote>
+<h4 id="2446-the-symbolic-link-layer">2.4.4.6 The symbolic link layer</h4>
+<ul>
+<li>Not covered in class, but you may refer to <a href="https://en.wikipedia.org/wiki/Symbolic_link">this page</a> if interested.</li>
+</ul>
+<h2 id="25-more-words-on-system-calls">2.5 More words on system calls</h2>
+<ul>
+<li>
+<p>System calls request services from the OS kernel on the user's behalf. They are actually &quot;wrappers&quot; of kernel's routines. For Unix, these wrappers are part of the C standard library, or <code>libc</code>.</p>
+<blockquote>
+<p>The emergence of <a href="https://en.wikipedia.org/wiki/C_(programming_language)">C programming language</a> is intertwined with Unix.</p>
+</blockquote>
+</li>
+<li>
+<p>System calls are different from traditional function calls, in that the routines called by the system calls reside in a portion of the memory that is inaccessible by the user. Typically that portion of virtual memory (<em>kernel address space</em>) is at the high-address part of the entire virtual memory.</p>
+<blockquote>
+<p>SIDE NOTE:<br>The threshold of user address space and kernel address space, namely the virtual memory split, depends on the kernel implementation and machine architecture. Typically, on a 32-bit machine running Linux, the split is: user address space - <code>0x00000000</code> to <code>0xbffffffff</code> (3GB), kernel address space - <code>0xc0000000</code> to <code>0xffffffff</code> (1GB). On Linux, you can examine the threshold in <code>/boot/</code>.</p>
+</blockquote>
+<blockquote>
+<p>SIDE NOTE:<br>On most mordern processors, software, will only use virtual addresses, during its normal operation. This holds true for kernel and user processes. Address translation hardware (usually inside the CPU), often referred to as a <em>memory management unit</em>, or MMU, automatically translates between the virtual and physical addresses, using a look-up table stored in the main memory, maintained by the OS. <br>One reason to introduce virtual addressing mechanism is using the mechanism of address translation to restrict user processes' access to the memory.</p>
+</blockquote>
+</li>
+<li>
+<p>When a user process makes a function call, it populates certain registers in the CPU. If the function call is a system call, it will write the opcode and arguments to CPU registers and trigger a <strong>software interuption</strong>, transferring the control to the interruption handler function. The handler, which resides in the kernel address space, reads the register values to the kernel space and performs the task requested by the system call, and then populate the return value to CPU register <code>RAX</code> (here the CPU is in <em>kernel mode</em>, an elevated previledge mode higher than the normal <em>user mode</em>). After that, the user process takes back the control and resumes execution. This black box mechanism guarantees that the user process has no access to the kernel address space's content.</p>
+<blockquote>
+<p><strong>Q</strong>: what if system calls are implemented like normal function calls? <br><strong>A</strong>: In normal function call, when user function <code>A()</code> calls on function <code>B()</code>, a chunk of memory <strong>in the user space</strong> will be allocated for <code>B()</code> (i.e. its stack frame). When <code>B()</code> completes, that memory chunk is released. However, though <code>B()</code>'s stack frame is released, it might not be erased immediately. Thus, <code>A()</code> can still <strong>read the &quot;ghost data&quot; via pointer arithmetics</strong>, potentially compromising data security. Also, <code>B()</code> can read <code>A()</code>'s stack frame as well. <br> Therefore, if <code>B()</code> is a kernel function and hence its data needs to be protected, <code>B()</code> needs to reside in the place <code>A()</code> has no access to - so <code>B()</code> needs to be placed in the kernel space, and one way to trigger <code>B()</code> is software interruption.</p>
+</blockquote>
+</li>
+</ul>
+<pre class="hljs"><code><div>        ┌────────────────────────────────────────┐ 0xffffffff            
+        │                                        │ 
+        :                 kernel                 :                  
+        │                                        │ 0xc0000000 
+  - - - ╠════════════════════════════════════════╣ - - -         
+        │                                        │ 0xbfffffff           
+        :                                        :                     
+        │                                        │            
+      ▲ ├────────────────────────────────────────┤  
+      │ │ user        main()'s stack frame       │          
+      │ │ stack       ─  ─  ─  ─  ─  ─  ─  ─  ─  │
+      │ │             foo()'s stack frame        │       
+   o  │ │─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │&lt;- %esp            
+   n  │ │                   ▼                    │   (stack pointer
+   e  │ │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │    register)
+      │ │          memory mapped region          │ 
+   u  │ │          for shared libraries          │ 
+   s  │ │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │ 
+   e  │ │                   ▲                    │      
+   r  │ │─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │&lt;- brk   
+      │ │              runtime heap              │   (variable 
+   p  │ │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │    maintained       
+   r  │ │                   bss                  │    by kernel)       
+   o  │ │        (unitialized static data)       │           
+   c  │ │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │           
+   e  │ │         rodata (read-only data)        │ ┐          
+   s  │ │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │ │          
+   s  │ │                  data                  │ ├ a.out           
+      │ │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │ │           
+      │ │              program text              │ ┘
+      │ │         (binary instructions)          │ &lt;- %rip   
+      ▼ ├────────────────────────────────────────┤    (instruction pointer
+        │                                        │     register points to
+        :                                        :     the next instruct.)      
+        │                                        │ 
+        └────────────────────────────────────────┘ 0x00000000             
+                   Virtual Memory Space                              
+</div></code></pre>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

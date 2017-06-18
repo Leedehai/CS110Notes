@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Networking (1)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-4-networking-1">Topic 4 Networking (1)</h1>
+<div id="author-signature">Leedehai</div>
+Friday, May 19, 2017<br>Monday, May 22, 2017
+<blockquote>
+<p><em>Networking</em>: enlisting the services of multiple machines.<br>Conceptually, multiple machines form a <em>local area network</em> (LAN) via <em>hub</em>s, and multiple LANs form a larger LAN via <em>bridge</em>s. Implementations of LAN include <em>Ethernet</em>, <em>Wi-Fi</em>, and <em>ARCNET</em>. <br>Multiple incompatible LANs form a larger interconnected network, called <em>internet</em>, via <em>router</em>s. The most widespread implementation of internet is the <em>global IP internet</em>, or referred to as the <em>Internet</em>.<br><em>World Wide Web</em>, or simply the <em>Web</em>, is the content served up through the Internet.</p>
+</blockquote>
+<h2 id="41-client-server-request-response">4.1 Client-server, request-response</h2>
+<h3 id="411-function-calls">4.1.1 &quot;Function calls&quot;</h3>
+<p>In CS110 we have four types of &quot;function calls&quot;, all of which can be framed in a client-server relationship: The <em>client</em> makes a <em>request</em>, and then the <em>server</em> makes a <em>response</em>.</p>
+<ul>
+<li>Traditional function call. For instance, <code>main()</code> calls <code>foo()</code>, then <code>main()</code> is the client requesting a service from the server <code>foo()</code> - <code>foo()</code> does something on <code>main()</code>'s behalf.</li>
+<li>System calls. The user function is the client, requesting a certain service, e.g. reading a file, from the OS, which acts as the server.</li>
+<li>Inter-process calls through pipes. For instance, in our <code>farm</code> assignment, the master process wants to factorize some integer numbers, so it requests the service from multiple subprocesses (<code>worker</code>s), each of which factorizes an integer on the master's behalf.</li>
+<li>Client-server in web communications. For instance, you type a search key in <a href="www.bing.com">bing.com</a>, and your web browser process, acting as the client, sends your search key via <a href="https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP</a> protocol to a Microsoft's machine near Seattle, and a process on that machine, identified by your browser with a &quot;virtual process ID&quot; (204.79.197.200:80) and acting as the server, responds via HTTP with a HTML file which contains search results, together with CSS files, JavaScript files, images, etc.
+<blockquote>
+<p>This inter-process communication relationship is like a pipe, but on inter-machine level instead of on intra-machine level. The term for this special &quot;pipe&quot; is <em>socket</em>.</p>
+</blockquote>
+</li>
+</ul>
+<p>We can see that networking is essentially no different from what we have seen in previous client-server relationships.</p>
+<pre class="hljs"><code><div>        ┌──────────┐                 ┌──────────┐            
+        │          │────request─────▶│          │            
+        │  Client  │                 │  Server  │            
+        │          │◀───response─────│          │            
+        └──────────┘                 └──────────┘ 
+        main()                       foo()                 ..function call
+        user process                 operating system      ..system call
+        proc. 1 on machine A         proc. 2 on machine A  ..pipe (x2)
+        proc. on machine A           proc. on machine B    ..socket
+</div></code></pre>
+<blockquote>
+<p>Here, a <em>server</em> is a conceptual entity, which is not to be confused with a <em>sever machine</em>.</p>
+</blockquote>
+<blockquote>
+<p>In the case of networking, the machine on which a (or multiple) network clients or servers is running is referred to as a <em>host</em>.</p>
+</blockquote>
+<h3 id="412-web-browsing-in-terminal">4.1.2 Web browsing in terminal</h3>
+<p>An experiment in your terminal, to see how request and response are made via network.</p>
+<pre class="hljs"><code><div>$ telnet www.bing.com 80                     [type and return]
+Trying 204.79.197.200...
+Connected to a-0001.a-msedge.net.
+Escape character is '^]'.
+GET / HTTP/1.1                               [type and return] ┐ request  
+Host: www.bing.com                           [type and return] │ in
+                                             [return again]    ┘ HTTP/1.1
+HTTP/1.1 200 OK                                                ┐
+Date: Mon, 29 May 2017 22:02:07 GMT                            │
+Cache-Control: private, max-age=0                              │
+Content-Type: text/html; charset=ISO-8859-1                    │ response
+Set-Cookie: ...blah blah blah                                  │ in
+P3P: ...blah blah blah                                         │ HTTP/1.1
+...                                                            │
+&lt;!DOCTYPE html...                                              │
+...blah blah blah                                              │
+...&lt;/html&gt;                                                     ┘
+Connection closed by foreign host.
+$
+</div></code></pre>
+<p>In the terminal session above, you made a HTTP request to the website, and a process on that website's machine response with a long text string, which could be interpreted by your web browser and rendered in a pictorial form.</p>
+<h3 id="413-cs110-time-server">4.1.3 CS110 time server</h3>
+<p>Actually, the response does not have to conform to HTTP protocol.
+Run an executable that fires up a server:</p>
+<pre class="hljs"><code><div>$ cd /usr/class/staff/examples/networking
+$ ./cs110_time_server
+Server listening on port 12345
+                            
+</div></code></pre>
+<p>In another terminal, we access that server. This time, we make no request, and the server automatically makes a response.</p>
+<pre class="hljs"><code><div>$ telnet myth15.stanford.edu 12345
+Trying 171.64.15.56...
+Connected to myth15.stanford.edu
+Escape character is '^]'.
+Mon May 29 00:02:01 2017                        &lt;-- the server's response
+Connection closed by foreign host.
+$
+</div></code></pre>
+<h2 id="42-implementing-a-server">4.2 Implementing a server</h2>
+<blockquote>
+<p>Linux's default network implementation complies with the Internet Protocol (IP).</p>
+</blockquote>
+<h3 id="421-operative-metaphor">4.2.1 Operative metaphor</h3>
+<ul>
+<li>Colloquially, server-side applications wait by the phone (at a particular phone extension), praying that someone — no, anyone! — will call.</li>
+<li>Formally, server-side applications create a server socket that listens to a particular port.</li>
+<li>On the server side, a <em>socket</em> is represented by an integer identifier, called <em>socket descriptor</em> (SD), essentially like a file descriptor associated with an IP address (think phone number) and port (think phone extension). A socket is <strong>bidirectional</strong> - equivalent to a pair of pipes with opposite directions.</li>
+<li>You should also think of the port number as a virtual process ID that is associated with the actual process ID of the server program on the host.</li>
+</ul>
+<h3 id="422-your-first-server-time-server">4.2.2 Your first server: time server</h3>
+<p>Our time server accepts all incoming connection requests and quickly publishes the time, regardless of what the client's request is.</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"socket++.h"</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kServerStartFailure = <span class="hljs-number">2</span>;
+
+<span class="hljs-comment">/* our cusrtom port number, should be larger than 1024 */</span>
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">short</span> kPortNumber = <span class="hljs-number">12345</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">publishTime</span><span class="hljs-params">(<span class="hljs-keyword">int</span> connectedSocket)</span></span>;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-comment">/* create a listening socket, with a designated port number */</span>
+  <span class="hljs-keyword">int</span> listenSocket = createServerSocket(kPortNumber);
+
+  <span class="hljs-keyword">if</span> (listenSocket == kServerSocketFailure) {
+    <span class="hljs-built_in">cerr</span> &lt;&lt; <span class="hljs-string">"Error: Could not start server on this port."</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-built_in">cerr</span> &lt;&lt; <span class="hljs-string">"Aborting... "</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-keyword">return</span> kServerStartFailure;
+  }
+  <span class="hljs-keyword">else</span> {
+    <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Server listening on port "</span> &lt;&lt; kPortNumber &lt;&lt; <span class="hljs-string">"."</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+  }
+
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-comment">/* wait until a connection request arrives, then open an
+     * connected socket descriptor, which is readable &amp; writable */</span>
+    <span class="hljs-keyword">int</span> connectedSocket = accept(listenSocket, <span class="hljs-literal">NULL</span>, <span class="hljs-literal">NULL</span>);
+
+    <span class="hljs-comment">/* make a response to that connection */</span>
+    publishTime(connectedSocket);
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">publishTime</span><span class="hljs-params">(<span class="hljs-keyword">int</span> connectedSocket)</span> </span>{
+  <span class="hljs-comment">/* The first five lines here produce the full time string that
+   * should be published. 
+   * These lines represent more generally the server-side computation
+   * produce a response. It could have been a static HTML page, a
+   * Bing search result, an RSS XML document, an image, or a video.
+   */</span>
+  <span class="hljs-keyword">time_t</span> rawtime;
+  time(&amp;rawtime);
+  <span class="hljs-keyword">struct</span> tm *ptm = gmtime(&amp;rawtime); <span class="hljs-comment">/* Greenwich Mean Time Zone */</span>
+  <span class="hljs-keyword">char</span> timeString[<span class="hljs-number">128</span>]; <span class="hljs-comment">/* should be big enough */</span>
+  strftime(timeString, <span class="hljs-keyword">sizeof</span>(timeString), <span class="hljs-string">"%c\n"</span>, ptm);
+
+  <span class="hljs-comment">/* now, we write to the connected socket descriptor, 
+   * just like writing to a traditional FD */</span>
+  <span class="hljs-keyword">size_t</span> nBytesWritten = <span class="hljs-number">0</span>, nBytesToWrite = <span class="hljs-built_in">strlen</span>(timeString);
+  <span class="hljs-keyword">while</span> (nBytesWritten &lt; nBytesToWrite) {
+    nBytesWritten += write(clientSocket,
+                           timeString + nBytesWritten,
+                           nBytesToWrite - nBytesWritten);
+  }
+  close(connectedSocket); <span class="hljs-comment">/* close the connected socket FD */</span>
+
+  <span class="hljs-comment">/* alternatively, the writing part could be written in a more C++ way:
+   *    sockbuf sb(connectedSocket);
+   *    iosockstream ss(&amp;sb);
+   *    ss &lt;&lt; timeString &lt;&lt; flush;
+   * connectedSocket is automatically closed when the sockbuf 
+   * object is destroyed.
+   */</span>
+}
+</div></code></pre>
+<h3 id="423-writing-to-sd-in-a-more-c-way">4.2.3 Writing to SD in a more C++ way</h3>
+<p>Alternatively, the writing part below...</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">size_t</span> nBytesWritten = <span class="hljs-number">0</span>, nBytesToWrite = <span class="hljs-built_in">strlen</span>(timeString);
+<span class="hljs-keyword">while</span> (nBytesWritten &lt; nBytesToWrite) {
+  nBytesWritten += write(clientSocket,
+                         timeString + nBytesWritten,
+                         nBytesToWrite - nBytesWritten);
+}
+close(connectedSocket);
+</div></code></pre>
+<p>...could be written in a more C++ way:</p>
+<pre class="hljs"><code><div><span class="hljs-function">sockbuf <span class="hljs-title">sb</span><span class="hljs-params">(connectedSocket)</span></span>;
+<span class="hljs-function">iosockstream <span class="hljs-title">ss</span><span class="hljs-params">(&amp;sb)</span></span>;
+ss &lt;&lt; timeString &lt;&lt; flush;
+</div></code></pre>
+<p>Note that the SD <code>connectedSocket</code> is automatically closed when the <code>sockbuf</code> object is destroyed. You should <strong>not</strong> close the SD manually if a <code>sockbuf</code> object owns it.</p>
+<p>Also note that a <code>iosockstream</code> object is both <strong>readable and writable</strong>, as long as the SD, which is owned by the underlying <code>sockbuf</code> object, is readable and writable.</p>
+<p>Classes <code>sockbuf</code> and <code>iosockstream</code> are not provided by C++ STL, but rather by a third-party open source library named &quot;<a href="http://members.aon.at/hstraub/linux/socket++/docu/socket++.html">sock++</a>&quot;, whose development seems to be terminated.</p>
+<h3 id="424-listening-sd-and-connected-sd">4.2.4 Listening SD and connected SD</h3>
+<ul>
+<li>A listening SD (<code>listenSocket</code> above) is
+<ul>
+<li>only created once, and exists for the entire life time of the server.</li>
+<li>is <strong>neither</strong> readable <strong>nor</strong> writable, its sole purpose being listening to a port and waiting for connection requests.</li>
+</ul>
+</li>
+<li>A connected SD (<code>connectedSocket</code> above), on the contrary,
+<ul>
+<li>only lasts as long as the communication is needed. It is opened when the server process accepts a connection request, and it <strong>should be closed</strong> when that communication ends.</li>
+<li>is readable and writable via system calls <code>read()</code> and <code>write()</code>, like a file descriptor. And the corresponding socket behaves like a file.</li>
+</ul>
+</li>
+</ul>
+<h3 id="425-block-wait-for-connection-requests-system-call-accept">4.2.5 Block &amp; wait for connection requests : system call <code>accept()</code></h3>
+<p>System call <code>accept()</code> accepts a connection request on a listening socket. Its prototype is</p>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">accept</span><span class="hljs-params">(<span class="hljs-keyword">int</span> listenfd, <span class="hljs-keyword">struct</span> sockaddr *addr, <span class="hljs-keyword">socklen_t</span> *addrlen)</span></span>;
+</div></code></pre>
+<ul>
+<li>Returns: non-negative connected SD on success, <code>−1</code> on error.</li>
+<li>The argument <code>listenfd</code> is a listening SD that has been created by our custom function <code>createServerSocket()</code>, which utilizes 3 system calls: partially create a SD with <code>socket()</code>, bound the SD to a local address with <code>bind()</code>, and convert the SD to a listening SD with <code>listen()</code>.</li>
+<li>The argument <code>addr</code> is a pointer to a <code>sockaddr</code> structure. This structure is filled in with the address of the peer socket, as known to the communications layer. The exact format is determined by the socket’s address family (see <code>socket()</code> and the respective protocol man pages).</li>
+<li>The <code>addrlen</code> argument is a value-result argument: it should initially contain the size of the structure pointed to by addr; on return it will contain the actual length (in bytes) of the address returned. When addr is <code>NULL</code> nothing is filled in.</li>
+<li>If no pending connections are present on the queue, and the socket is NOT marked as non-blocking, <code>accept()</code> blocks until a connection is present.</li>
+</ul>
+<p>A nice illustration:</p>
+<pre class="hljs"><code><div>INSIDE THE SERVER MACHINE:
+                ┌───────────────────────┐                     │
+(no connection  []listening SD          │                     ▼ time
+   reqeust)     │ (accept() blocks)     │
+                │                       │ a server process
+                │                       │
+                │                       │                
+                └───────────────────────┘
+                ┌───────────────────────┐            
+╸╸╸connection╸╸▶[]listening SD          │            
+     request    │ (accept() returns     │
+                │  a connected SD)      │ a server process
+                │               │       │
+                []connected SD ◀┘       │            
+                └───────────────────────┘
+                ┌───────────────────────┐            
+                []listening SD          │            
+                │                       │
+                │                       │ a server process 
+    requests ─▶ │ (readable &amp; writable) │
+◀════socket════▶[]connected SD ◀─▶ R/W  │            
+  ◀─ responses  └───────────────────────┘
+</div></code></pre>
+<h2 id="43-server-side-multithreading">4.3 Server-side multithreading</h2>
+<p>Networking and multithreading are a natural match.</p>
+<ul>
+<li>The work a server needs to do in order to meet the client's request might be time consuming — so time consuming that a sequential implementation, like 4.2.2's while-true loop, might handicap the server's ability to accept future requests.</li>
+<li>One solution: as soon as <code>accept()</code> returns a connected SD, we spawn a child thread to get the time consuming computation off from the main thread. The child thread can make use of a second processor or a second core, and the main thread can quickly move on to its next call to <code>accept()</code>.</li>
+</ul>
+<h3 id="431-re-implement-the-time-server">4.3.1 Re-implement the time server</h3>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"socket++.h"</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kServerStartFailure = <span class="hljs-number">2</span>;
+
+<span class="hljs-comment">/* our cusrtom port number, should be larger than 1024 */</span>
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">short</span> kPortNumber = <span class="hljs-number">12345</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">publishTime</span><span class="hljs-params">(<span class="hljs-keyword">int</span> connectedSocket)</span></span>;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-comment">/* create a listening socket, with a designated port number */</span>
+  <span class="hljs-keyword">int</span> listenSocket = createServerSocket(kPortNumber);
+
+  <span class="hljs-keyword">if</span> listenSocket == kServerSocketFailure) {
+    <span class="hljs-built_in">cerr</span> &lt;&lt; <span class="hljs-string">"Error: Could not start server on this port."</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-built_in">cerr</span> &lt;&lt; <span class="hljs-string">"Aborting... "</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-keyword">return</span> kServerStartFailure;
+  }
+  <span class="hljs-keyword">else</span> {
+    <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Server listening on port "</span> &lt;&lt; kPortNumber &lt;&lt; <span class="hljs-string">"."</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+  }
+
+  <span class="hljs-comment">/* ThreadPool: already done in our assignment 6 */</span>
+  <span class="hljs-function">ThreadPool <span class="hljs-title">pool</span><span class="hljs-params">(<span class="hljs-number">4</span>)</span></span>; <span class="hljs-comment">/* spawn 4 child threads as workers */</span>
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-comment">/* blocks &amp; wait */</span>
+    <span class="hljs-keyword">int</span> connectedSocket = accept(listenSocket, <span class="hljs-literal">NULL</span>, <span class="hljs-literal">NULL</span>);
+    <span class="hljs-comment">/* schedule, let the Threadpool object handle multithreading */</span>
+    pool.schedule([connectedSocket] { publishTime(clientSocket); });
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">publishTime</span><span class="hljs-params">(<span class="hljs-keyword">int</span> connectedSocket)</span> </span>{
+  <span class="hljs-comment">/* Similar to 4.2.2, but need to be thread-safe */</span>
+  <span class="hljs-keyword">time_t</span> rawtime;
+  time(&amp;rawtime);
+  <span class="hljs-keyword">struct</span> tm tm;
+  gmtime_r(&amp;rawtime, &amp;tm);
+  <span class="hljs-keyword">char</span> timeString[<span class="hljs-number">128</span>];
+  strftime(timeString, <span class="hljs-keyword">sizeof</span>(timeString), <span class="hljs-string">"%c\n"</span>, ptm);
+
+  <span class="hljs-function">sockbuf <span class="hljs-title">sb</span><span class="hljs-params">(connectedSocket)</span></span>;
+  <span class="hljs-function">iosockstream <span class="hljs-title">ss</span><span class="hljs-params">(&amp;sb)</span></span>;
+  ss &lt;&lt; timeString &lt;&lt; <span class="hljs-built_in">endl</span> &lt;&lt; flush;
+} <span class="hljs-comment">/* sockbuf's destructor will close connectedSocket */</span>
+</div></code></pre>
+<blockquote>
+<p>Note that with multithreading, your code needs to be <strong>thread-safe</strong>, i.e. avoid race conditions and deadlocks. Reiterated, your code of reading and writing against a SD needs to be thread-safe, so it is not merely copy-and-paste the mono-thread version.</p>
+</blockquote>
+<h2 id="44-implementing-a-client-time-client">4.4 Implementing a client: time_client</h2>
+<p>The description:</p>
+<ul>
+<li>The client connects, i.e. &quot;rings&quot; the service's phone (IP) at a particular &quot;extension&quot; (port), and waits for the server to &quot;pick up&quot; (accept).</li>
+<li>The client says nothing.</li>
+<li>The server speaks by publishing the current time into its own end of the connection (socket) and then hangs up (close the server's connected SD).</li>
+<li>The client reads the published text, publishes it to the console, and then itself hangs up (close the client's SD).</li>
+</ul>
+<h3 id="441-the-code">4.4.1 The code</h3>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-comment">/* send the server a connection request, return an SD upon sucess */</span>
+  <span class="hljs-keyword">int</span> clientSocket = createClientSocket(<span class="hljs-string">"myth7.stanford.edu"</span>, <span class="hljs-number">12345</span>);
+  <span class="hljs-keyword">if</span> (clientSocket == kClientSocketError) {
+    <span class="hljs-built_in">cerr</span> &lt;&lt; <span class="hljs-string">"Time server could not be reached"</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-built_in">cerr</span> &lt;&lt; <span class="hljs-string">"Aborting"</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+  }
+
+  <span class="hljs-comment">/* read from the SD */</span>
+  <span class="hljs-function">sockbuf <span class="hljs-title">sb</span><span class="hljs-params">(clientSocket)</span></span>;
+  <span class="hljs-function">iosockstream <span class="hljs-title">ss</span><span class="hljs-params">(&amp;sb)</span></span>;
+  <span class="hljs-built_in">string</span> timeline;
+  getline(ss, timeline);
+  <span class="hljs-built_in">cout</span> &lt;&lt; timeline &lt;&lt; <span class="hljs-built_in">endl</span>;
+
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+} <span class="hljs-comment">/* clientSocket will be closed by sockbuf's destructor */</span>
+</div></code></pre>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

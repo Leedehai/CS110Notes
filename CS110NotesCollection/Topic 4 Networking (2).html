@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Networking (2)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-4-networking-2">Topic 4 Networking (2)</h1>
+<div id="author-signature">Leedehai</div>
+Wednesday, May 24, 2017
+<h2 id="45-a-taste-of-http-emulating-wget">4.5 A taste of HTTP: emulating <code>wget</code></h2>
+<blockquote>
+<p><a href="https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP</a>: Hypertext Transfer Protocol, an application layer protocol widely used in today's web.</p>
+</blockquote>
+<blockquote>
+<p>Ha, I just used this command tool, <code>wget</code>, a week ago.</p>
+</blockquote>
+<h3 id="451-description">4.5.1 Description</h3>
+<p><code>wget</code> is a command line utility that, given a <a href="https://en.wikipedia.org/wiki/URL">Universal Resource Locator</a> (URL), can downloads files (.html, .js, .jpg, .mov, .zip, or whatever). For example, we want to download a picture of a guru in computer science, Professor <a href="https://en.wikipedia.org/wiki/Donald_Knuth">Donald Knuth</a> at Stanford.</p>
+<pre class="hljs"><code><div>$ wget https://en.wikipedia.org/wiki/File:KnuthAtOpenContentAlliance.jpg -O DKnuth.jpg
+--2017-05-28 08:07:15--  https://en.wikipedia.org/wiki/File:KnuthAtOpenContentAlliance.jpg
+Resolving en.wikipedia.org... 198.35.26.96, 2620:0:863:ed1a::1
+Connecting to en.wikipedia.org|198.35.26.96|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Saving to: ‘DKnuth.jpg’
+
+DKnuth.jpg                    [ &lt;=&gt;                                ]  44.27K  --.-KB/s    in 0.01s
+
+2017-05-28 08:07:16 (3.71 MB/s) - ‘DKnuth.jpg’ saved [45337]
+$
+</div></code></pre>
+<p>Our implementation, <code>web-get</code>, simplifies <code>wget</code>'s functionality, but nonetheless serves a good example to illustrate most basic parts of the HTTP protocol, since this tool need to speak HTTP, specifically HTTP/1.0 dialect, to fulfill its mission.</p>
+<pre class="hljs"><code><div>$ web-get https://en.wikipedia.org/wiki/File:KnuthAtOpenContentAlliance.jpg
+Total number of bytes fetched: 45337
+$
+</div></code></pre>
+<blockquote>
+<p>SIDE NOTE:<br>Review from EE284 or CS144: Internet protocol suite in TCP/IP 4-layer model<br>Application layer (with typical port number) - BGP(179), <strong>DHCP</strong>(67,68), <strong>DNS</strong>(53), <strong>FTP</strong>(21), <strong>HTTP</strong>(80), <strong>HTTPS</strong>(443), <strong>IMAP</strong>(143), NTP(123), <strong>POP3</strong>(110), <strong>SMTP</strong>(25), <strong>SSH</strong>(22), <strong>Telnet</strong>(23), ...<br>Transport layer - <strong>TCP</strong>, <strong>UDP</strong>, DCCP, SCTP, RSVP, ...<br>Internet layer - <strong>IP</strong> (IPv4, IPv6), ICMP, ECN, IGMP, OSPF, ...<br>Link layer - <strong>ARP</strong>, NDP, PPP, <strong>MAC</strong> (Ethernet, DSL, ISDN, FDDI), ...</p>
+</blockquote>
+<h3 id="452-the-code-kob">4.5.2 The code (KOB)</h3>
+<p>First and foremost, we can see the high-level structure from the <code>main()</code> and the <code>pullContent()</code>.</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"socket++.h"</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  pullContent(parseURL(argv[<span class="hljs-number">1</span>]));
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">/* helper: skip "http://" and split the rest into "host" and "path" */</span>
+pair&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">string</span>&gt; parseURL(<span class="hljs-built_in">string</span> url) {
+  <span class="hljs-keyword">if</span> (startsWith(url, kProtocolPrefix))
+    url = url.substr(kProtocolPrefix.size());
+  <span class="hljs-keyword">size_t</span> found = url.find(<span class="hljs-string">'/'</span>);
+  <span class="hljs-keyword">if</span> (found == <span class="hljs-built_in">string</span>::npos)
+    <span class="hljs-keyword">return</span> make_pair(url, kDefaultPath); <span class="hljs-comment">/* defined in &lt;utility&gt; */</span>
+  <span class="hljs-built_in">string</span> host = url.substr(<span class="hljs-number">0</span>, found);
+  <span class="hljs-built_in">string</span> path = url.substr(found);
+  <span class="hljs-keyword">return</span> make_pair(host, path);
+}
+
+<span class="hljs-comment">/* helper: get the filename, i.e. the last component of the path */</span>
+<span class="hljs-function"><span class="hljs-built_in">string</span> <span class="hljs-title">getFileName</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span>&amp; path)</span> </span>{
+  <span class="hljs-keyword">if</span> (path.empty() || path[path.size() - <span class="hljs-number">1</span>] == <span class="hljs-string">'/'</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">"index.html"</span>; <span class="hljs-comment">/* not always correct, but not the point */</span>
+  }
+  <span class="hljs-keyword">size_t</span> found = path.rfind(<span class="hljs-string">'/'</span>);
+  <span class="hljs-keyword">return</span> path.substr(found + <span class="hljs-number">1</span>);
+}
+
+<span class="hljs-comment">/* Do the real work */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">pullContent</span><span class="hljs-params">(<span class="hljs-keyword">const</span> pair&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">string</span>&gt;&amp; parsedURL)</span> </span>{
+  <span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span> &amp;host = parsedURL.first; <span class="hljs-comment">/* www.google.com */</span>
+  <span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span> &amp;path = parsedURL.second;<span class="hljs-comment">/* images/branding/(...).png */</span>
+  
+  <span class="hljs-comment">/* The six steps of downloading */</span>
+  <span class="hljs-comment">/* step 1: connect to the server (port 80 for HTTP), get an SD */</span>
+  <span class="hljs-keyword">int</span> clientSocket = createClientSocket(host, <span class="hljs-number">80</span>);
+  <span class="hljs-comment">/* step 2: layer a buffer over the "bare" SD */</span> 
+  <span class="hljs-function">sockbuf <span class="hljs-title">sb</span><span class="hljs-params">(clientSocket)</span></span>;
+  <span class="hljs-comment">/* step 3: create a stream class around the buffer */</span>
+  <span class="hljs-function">iosockstream <span class="hljs-title">ss</span><span class="hljs-params">(&amp;sb)</span></span>;
+  <span class="hljs-comment">/* step 4: send request via the socket stream */</span>
+  issueRequest(ss, host, path);
+  <span class="hljs-comment">/* step 5: skip the header of the response (placed in the stream) */</span>
+  skipHeader(ss);
+  <span class="hljs-comment">/* step 6: save the payload (placed in the stream) */</span>
+  savePayload(ss, getFileName(path));
+}
+</div></code></pre>
+<p>Here are the functions responsible for those steps.</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* send request via the socket stream */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">issueRequest</span><span class="hljs-params">(iosockstream&amp; ss, <span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span>&amp; host, <span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span>&amp; path)</span> </span>{
+  ss &lt;&lt; <span class="hljs-string">"GET "</span> &lt;&lt; path &lt;&lt; <span class="hljs-string">" HTTP/1.0\r\n"</span>;
+  ss &lt;&lt; <span class="hljs-string">"Host: "</span> &lt;&lt; host &lt;&lt; <span class="hljs-string">"\r\n"</span>;
+  ss &lt;&lt; <span class="hljs-string">"\r\n"</span>; <span class="hljs-comment">/* indicating "the end of my HTTP request" */</span>
+  ss.flush();   <span class="hljs-comment">/* ensure everthing is truely pushed through the web */</span>
+}
+<span class="hljs-comment">/* It is not much difference from what we manually type into the terminal
+ * when requesting a connection to a server, as shown in 4.1.2.
+ * Note that HTTP requires "\r\n" to denote a line-breaking, not "\n" */</span>
+</div></code></pre>
+<pre class="hljs"><code><div><span class="hljs-comment">/* skip the header of the response, which is written
+ * by the server to the socket stream */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">skipHeader</span><span class="hljs-params">(iosockstream&amp; ss)</span> </span>{
+  <span class="hljs-built_in">string</span> line;
+  <span class="hljs-keyword">do</span> {
+    getline(ss, line);
+  } <span class="hljs-keyword">while</span> (!line.empty() &amp;&amp; line != <span class="hljs-string">"\r"</span>);
+}
+</div></code></pre>
+<pre class="hljs"><code><div><span class="hljs-keyword">const</span> <span class="hljs-keyword">size_t</span> kBufferSize = <span class="hljs-number">1024</span>;
+<span class="hljs-comment">/* save the paload, e.g. texts, images, videos.. */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">savePayload</span><span class="hljs-params">(iosockstream&amp; ss, <span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span>&amp; filename)</span> </span>{
+  <span class="hljs-function">ofstream <span class="hljs-title">output</span><span class="hljs-params">(filename, ios::binary)</span></span>; <span class="hljs-comment">/* it might not be text */</span>
+
+  <span class="hljs-comment">/* conutinuously read and write */</span>
+  <span class="hljs-keyword">size_t</span> totalBytes = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">while</span> (!ss.fail()) {
+    <span class="hljs-keyword">char</span> buffer[kBufferSize] = {<span class="hljs-string">'\0'</span>};
+    ss.read(buffer, <span class="hljs-keyword">sizeof</span>(buffer));   <span class="hljs-comment">/* read from stream to buffer */</span>
+    totalBytes += ss.gcount();
+    output.write(buffer, ss.gcount()); <span class="hljs-comment">/* write from buffer to file */</span>
+  }
+  <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Total number of bytes fetched: "</span> &lt;&lt; totalBytes &lt;&lt; <span class="hljs-built_in">endl</span>;
+}
+</div></code></pre>
+<p>Note that <code>getline()</code> and <code>read()</code> will block if there is nothing to read.</p>
+<h3 id="453-some-tidbits">4.5.3 Some tidbits</h3>
+<ul>
+<li>When we create a file to store the payload, we open an <code>ofstream</code> object in <strong>binary mode</strong>: <code>ios::binary</code>, since the payload might not necessarily be text, and hence we certainly do not want the <code>ofstream</code> object to do anything funky with bytes that are accidentally newline characters.</li>
+<li>The HTTP/1.0 protocol dictates that everything beyond that blank line is payload, and that once the server publishes each and every byte of the payload, it closes it's end of the connection. A side's socket closure is the other side's <code>EOF</code>.
+<blockquote>
+<p>Just like a pipe: write-end's closure is interpreted by the read-end as an <code>EOF</code>.</p>
+</blockquote>
+</li>
+<li>The HTTP/1.1 protocol allows for connections to remain open  after the initial payload has come through. The code specifically avoids this here by going with HTTP/1.0, which doesn't allow this.</li>
+</ul>
+<h2 id="46-relevant-system-calls">4.6 Relevant system calls</h2>
+<h3 id="461-need-to-know-ip-addresses-domain-names">4.6.1 Need-to-know: IP addresses, domain names</h3>
+<ul>
+<li>IP addresses are defined by the <a href="https://en.wikipedia.org/wiki/Internet_Protocol">Internet Protocol</a> at the Internet layer, and are used to uniquely identify Internet software interfaces. They are not to be confused with MAC addresses, which uniquely identify networking hardware. There are two notable versions of IP: version 4 (IPv4) and version 6 (IPv6).</li>
+<li>IPv4: 32 bits, typically represented by a decimal quad, each component of which is an integer between <code>0</code> and <code>255</code>. For example: <code>127.0.0.1</code>. In implementation, an IPv4 address is packed in a 32-bit integer.
+<blockquote>
+<p>SIDE NOTE:<br> There are about 2 billions IPv4 addresses, but now we are running out of them. As one of the early developer of Internet, Stanford University took one class-A IP address range, which contains 2<sup>24</sup> addresses (<code>36.x.x.x</code>). In 1993, the IP address distributor convinced Stanford to give it up in exchange for two class-B ranges, which have 2<sup>16</sup>x2 addresses in total.</p>
+</blockquote>
+</li>
+<li>IPv6: 128 bits, typically represented by a hexadecimal octet, each component of which is an integer between <code>0</code> and <code>FFFF</code>, like <code>20EE:22FF:000A:009A:0000:0000:0000:0000</code>. Sometimes unnecessary zeros are omitted, as in <code>20EE:22FF:A:9A::</code>. In implementation, an IPv6 address is packed in 16 <code>char</code>s.</li>
+<li><a href="https://en.wikipedia.org/wiki/Domain_Name_System">Domain Name System</a>, or DNS, maps an IP address (like a phone number) to a string that is human-friendly (like a person's name), e.g. <code>54.68.192.252</code> is mapped with <code>www.stanford.edu</code>. Such a string is called a <em>domain name</em>. A hierarchical network of DNS server machines handles DNS query.
+<blockquote>
+<p>SIDE NOTE:<br>One of the tricks employed by the Great Firewall is <a href="https://en.wikipedia.org/wiki/DNS_spoofing">DNS Poisoning</a>, i.e. altering this mapping relationship on the DNS servers, so they cannot return correct IP addresses of certain websites. Another trick is using HTTP proxies to filter the traffic, which we will see in the assignment.</p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>SIDE NOTE:<br>You can examine and edit your machine's network interface configuration with command <code>ifconfig</code>.<br>You can send ICMP ECHO_REQUEST packets to a host designated by you with command <code>ping</code>.</p>
+</blockquote>
+<p>Refer to EE284 or CS144 for more details.</p>
+<h3 id="462-hostname-resolution">4.6.2 Hostname resolution</h3>
+<ul>
+<li>Linux uses the <code>hostent</code> structure to store a IP address/domain name pair, with other info:<pre class="hljs"><code><div><span class="hljs-keyword">struct</span> hostent { <span class="hljs-comment">/* "host entry" */</span>
+  <span class="hljs-keyword">char</span> *h_name;       <span class="hljs-comment">/* host name */</span>
+  <span class="hljs-keyword">char</span> **h_aliases;   <span class="hljs-comment">/* list of host aliases, terminated by NULL */</span>
+  <span class="hljs-keyword">int</span> h_addrtype; <span class="hljs-comment">/* address type. AF_INET for v4, AF_INET6 for v6 */</span>
+  <span class="hljs-keyword">int</span> h_length;   <span class="hljs-comment">/* address length. 4 for v4, 6 for v6 */</span>
+  <span class="hljs-keyword">char</span> **h_addr_list; <span class="hljs-comment">/* list of addresses, terminated by NULL */</span>
+};
+</div></code></pre>
+<blockquote>
+<p>&quot;AF&quot; for &quot;address family&quot;.</p>
+</blockquote>
+</li>
+<li>You can use this system call to acquire the address of the corresponding <code>hostent</code> structure from a host name:<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">struct</span> hostent *<span class="hljs-title">gethostbyname</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *name)</span></span>; <span class="hljs-comment">/* get IPv4 addr. */</span>
+<span class="hljs-function"><span class="hljs-keyword">struct</span> hostent *<span class="hljs-title">gethostbyname2</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *name)</span></span>;<span class="hljs-comment">/* get IPv6 addr. */</span>
+</div></code></pre>
+</li>
+<li>Depending on the type of IP address, an element of <code>h_addr_list</code> is a pointer to an <code>in_addr</code> or an <code>in_addr6</code> structure. We focus on the IPv4 version in our discussion.<pre class="hljs"><code><div><span class="hljs-keyword">struct</span> in_addr { <span class="hljs-comment">/* contains one IPv4 address */</span>
+  uint32 s_addr; <span class="hljs-comment">/* big-endian */</span>
+};
+</div></code></pre>
+</li>
+<li>You can get the IP address string(s) from a <code>hostent</code> structure's <code>h_addr_list</code> field. In the case of IPv4, you can use this system call to translate an <code>in_addr</code> structure to the human-readable address string:<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">char</span> *<span class="hljs-title">inet_ntoa</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> in_addr in)</span></span>; <span class="hljs-comment">/* "ntoa": number to ASCII */</span>
+</div></code></pre>
+</li>
+</ul>
+<h3 id="463-the-sockaddr-hierarchy-ip-addressport-number">4.6.3 The <code>sockaddr</code> hierarchy: IP address/port number</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* all in big-endian */</span>
+
+<span class="hljs-keyword">struct</span> sockaddr_in {           <span class="hljs-comment">/* IPv4 socket addr./port record */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> sin_family;   <span class="hljs-comment">/* protocol for socket: AF_INET, 2 bytes */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> sin_port;     <span class="hljs-comment">/* port number, 2 bytes */</span>
+  <span class="hljs-keyword">struct</span> in_addr sin_addr;     <span class="hljs-comment">/* IP address, 4 bytes */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span> sin_zero[<span class="hljs-number">8</span>];   <span class="hljs-comment">/* pad this structure to 16 bytes long */</span>
+};
+
+<span class="hljs-keyword">struct</span> sockaddr_in6 {          <span class="hljs-comment">/* IPv6 socket addr./port record */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> sin6_family;  <span class="hljs-comment">/* protocol for socket: AF_INET6 */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> sin6_port;    <span class="hljs-comment">/* port number */</span>
+  <span class="hljs-comment">/* ... */</span>
+};
+
+<span class="hljs-keyword">struct</span> sockaddr {              <span class="hljs-comment">/* generic socket addr./port record */</span>
+  <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> sa_family;    <span class="hljs-comment">/* AF_INET or AF_INET6 */</span>
+  <span class="hljs-keyword">char</span> sa_data[<span class="hljs-number">14</span>];            <span class="hljs-comment">/* other data, padding this structure
+                                  to 16 bytes long */</span>
+};
+</div></code></pre>
+<ul>
+<li>The <code>struct sockaddr</code> type exists as C's best imitation of an abstract base class.</li>
+<li>You rarely declare variables of type <code>struct sockaddr</code>, but many system calls will accept parameters of type <code>struct sockaddr *</code>, so they can accept either IPv4 or IPv6 versions using one uniform API.</li>
+<li>If a system call accepts a parameter of type <code>struct sockaddr *</code>, it really excepts the address of either a <code>struct sockaddr_in</code> or a <code>struct sockaddr_in6</code>. The system call relies on the value within the first two bytes — the <code>sa_family</code> field — to determine what the real type is.</li>
+</ul>
+<h3 id="464-implementing-createclientsocket">4.6.4 Implementing <code>createClientSocket()</code></h3>
+<blockquote>
+<p>You don't need to write this on your own, but since this is not a system call, we want you know it.</p>
+</blockquote>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">createClientSocket</span><span class="hljs-params">(<span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span> &amp;host, <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> port)</span> </span>{
+  <span class="hljs-comment">/* step 1: get the IP address of the intended host */</span>
+  <span class="hljs-keyword">struct</span> hostent *he = gethostbyname(host.c_str());
+  <span class="hljs-keyword">if</span> (he == <span class="hljs-literal">NULL</span>) <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>; <span class="hljs-comment">/* e.g. the host machine is down */</span>
+
+  <span class="hljs-comment">/* step 2: get an unused SD */</span>
+  <span class="hljs-keyword">int</span> s = socket(AF_INET, SOCK_STREAM, <span class="hljs-number">0</span>);
+  <span class="hljs-keyword">if</span> (s &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+
+  <span class="hljs-comment">/* step 3: create an (IP, port) pair structure, and fill it with 0's */</span>
+  <span class="hljs-keyword">struct</span> sockaddr_in server;
+  <span class="hljs-built_in">memset</span>(&amp;server, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(server));
+
+  <span class="hljs-comment">/* step 4: populate the (IP, port) pair structure */</span>
+  server.sin_family = AF_INET;
+  <span class="hljs-comment">/* make unsignshed short big-endian, per networking standard */</span>
+  server.sin_port = htons(port);
+  server.sin_addr = (in_addr *)((sin_addr *)he-&gt;h_addr_list[<span class="hljs-number">0</span>]);
+
+  <span class="hljs-comment">/* step 5: connect the intended (IP, port) */</span>
+  <span class="hljs-keyword">if</span> (connect(s, (sockaddr *)&amp;server, <span class="hljs-keyword">sizeof</span>(server)) == <span class="hljs-number">0</span>)
+    <span class="hljs-keyword">return</span> s;
+
+  close(s); <span class="hljs-comment">/* if connect() fails, close s as an FD */</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+}
+</div></code></pre>
+<ul>
+<li>System call <code>socket()</code>: create a socket. In CS110, we do not have to know the details of it behavior, and always call it this way: <code>socket(AF_INET, SOCK_STREAM, 0)</code>. This function gets an unused file descriptor, and configures it as a socket descriptor, and then return it.
+<blockquote>
+<p><code>AF_INET</code>: IPv4 protocol family;<br><code>SOCK_STREAM</code>: if a data package is dropped, then automatically request it again;<br><code>0</code>: choose a specific protocol within the designated protocol family. IPv4 has just one, hence 0.</p>
+</blockquote>
+</li>
+<li>System call <code>connect()</code> establishes a connection with a server.<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">connect</span><span class="hljs-params">(<span class="hljs-keyword">int</span> sockfd, <span class="hljs-keyword">struct</span> sockaddr *server, <span class="hljs-keyword">int</span> len)</span></span>;
+<span class="hljs-comment">/* "len" is sizeof(sockaddr) */</span>
+</div></code></pre>
+<ul>
+<li>It attempts to establish an Internet connection with the server whose IP address and port are specified by <code>server</code>, through the socket designated by <code>sockfd</code>.</li>
+<li><strong>It blocks</strong> until either the connection is successfully established or an error occurs. If successful, the <code>sockfd</code> descriptor is ready for reading <strong>and</strong> writing, and the target server has created a designated socket to handle the communication.
+<blockquote>
+<p>Note that a socket is bidirectional, but a pipe is unidirectional.</p>
+</blockquote>
+</li>
+<li>It returns <code>0</code> on success, <code>-1</code> on failure (and <code>errno</code> is properly set to indicate the reason).</li>
+<li>Remember to close <code>sockfd</code> if <code>connect()</code> fails.</li>
+</ul>
+</li>
+</ul>
+<h3 id="465-implementing-createserversocket">4.6.5 Implementing <code>createServerSocket()</code></h3>
+<p>Listen to a specific port on any of its own IP address.</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kReuseAddresses = <span class="hljs-number">1</span>;   <span class="hljs-comment">/* 1 means true here */</span>
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kDefaultBacklog = <span class="hljs-number">128</span>; <span class="hljs-comment">/* allow 128 clients to queue */</span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">createServerSocket</span><span class="hljs-params">(<span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> port)</span> </span>{
+  <span class="hljs-comment">/* step 1: get an unused SD */</span>
+  <span class="hljs-keyword">int</span> s = socket(AF_INET, SOCK_STREAM, <span class="hljs-number">0</span>);
+  <span class="hljs-keyword">if</span> (s &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+  <span class="hljs-comment">/* setsockopt() used here so port becomes available even if
+   * server crashes and reboots */</span>
+  <span class="hljs-keyword">if</span> (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, 
+                 &amp;kReuseAddresses, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">int</span>)) &lt; <span class="hljs-number">0</span>) {
+    close(s);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+  }
+
+  <span class="hljs-comment">/* step 2: create an (IP, port) pair structure, and fill it with 0's */</span>
+  <span class="hljs-keyword">struct</span> sockaddr_in server;
+  <span class="hljs-built_in">memset</span>(&amp;server, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(server));
+
+  <span class="hljs-comment">/* step 3: populate the (IP, port) pair structure */</span>
+  server.sin_family = AF_INET;
+  <span class="hljs-comment">/* make unsignshed short big-endian, per networking standard */</span>
+  server.sin_port = htons(port);
+  <span class="hljs-comment">/* make unsignshed long big-endian, per networking standard */</span>
+  <span class="hljs-comment">/* we are creating a listening SD, so it should wait for 
+   * requests from any IP address */</span>
+  server.sin_addr.s_addr = htonl(INADDR_ANY);
+
+  <span class="hljs-comment">/* step 4: bind the (IP, port) pair with the socket,
+   * and make it a listenning socket */</span>
+  <span class="hljs-keyword">if</span> (bind(s, (sockaddr *) &amp;server, <span class="hljs-keyword">sizeof</span>(server)) == <span class="hljs-number">0</span> 
+      &amp;&amp; listen(s, kDefaultBacklog) == <span class="hljs-number">0</span>) 
+    <span class="hljs-keyword">return</span> s;
+
+  close(s);
+  <span class="hljs-keyword">return</span> kServerSocketFailure;
+}
+</div></code></pre>
+<ul>
+<li>Note that server socket, or <em>listening socket</em>, is <strong>neither</strong> readable <strong>nor</strong> writable. It waits incoming connection request from clients through <code>accept()</code> system call, as described in 4.2.5.</li>
+</ul>
+<h3 id="466-summary-steps-of-creating-sockets">4.6.6 Summary: steps of creating sockets</h3>
+<h4 id="4661-for-client-create-a-client-socket">4.6.6.1 For client: create a client socket</h4>
+<p>step 1: get the IP address of the intended server: <code>gethostbyname()</code>;</p>
+<p><strong>step 2</strong>: get an unused SD: <code>socket()</code>;</p>
+<p><strong>step 3</strong>: create an (IP, port) pair structure of type <code>sockaddr_in</code>, and fill it with <code>0</code>'s;</p>
+<p><strong>step 4</strong>: populate the (IP, port) pair structure's fields: <code>.sin_family</code>, <code>.sin_port</code>, <code>.sin_addr</code>;</p>
+<blockquote>
+<p>Note that <code>.sin_port</code>, <code>.sin_addr</code> should be the port number and IP address of the other party, i.e. the server, not of the client itself.<br>(remember to make sure these two fields big-endian).</p>
+</blockquote>
+<p>step 5: connect the intended (IP, port) through the socket: <code>connect()</code>. If failed, remember to close the socket.</p>
+<h4 id="4662-for-server-1-create-a-listening-socket">4.6.6.2 For server (1): create a listening socket</h4>
+<p><strong>step 1</strong>: get an unused SD: <code>socket()</code>;</p>
+<p><strong>step 2</strong>: create an (IP, port) pair structure of type <code>sockaddr_in</code>, and fill it with <code>0</code>'s;</p>
+<p><strong>step 3</strong>: populate the (IP, port) pair structure's fields: <code>.sin_family</code>, <code>.sin_port</code>, <code>.sin_addr</code>;</p>
+<blockquote>
+<p>Note that <code>.sin_port</code>, <code>.sin_addr</code> should be the port number and IP address of the other party, i.e. the client, not of the server itself. If there is no designated client, pass <code>INADDR_ANY</code> as the IP address.<br>(remember to make sure these two fields big-endian).</p>
+</blockquote>
+<p>step 4: bind the (IP, port) pair with the socket: <code>bind()</code>, and make it a listening socket: <code>listen()</code>. If failed, remember to close the socket.</p>
+<blockquote>
+<p>By default, an SD created by <code>socket()</code> is not intended for listening (a &quot;passive&quot; role). If you want to make it a <em>listening socket</em>, you need to call <code>listen()</code> to convert it.</p>
+</blockquote>
+<blockquote>
+<p>Note that <code>listen()</code> immediately returns; <code>accept()</code> is blocking.</p>
+</blockquote>
+<h4 id="4663-for-server-2-create-a-connected-socket">4.6.6.3 For server (2): create a connected socket</h4>
+<p>Call <code>accept()</code> on the server's (only) listening SD. <code>accept()</code> blocks the calling thread until a connection request from a client is received, at which point a connected SD will be automatically created and returned by <code>accept()</code>. The connected SD should be closed once the client is done.</p>
+<blockquote>
+<p>Note that <code>listen()</code> immediately returns; <code>accept()</code> is blocking.</p>
+</blockquote>
+<pre class="hljs"><code><div>a client process (IP, port)                   a server process (IP, port)
+┌───────────────────────┐                     ┌───────────────────────┐
+│                       │                     []listening SD          │
+│                       │                     │                       │
+│                       │   another client ◀═▶[]connected SD ◀─▶ R/W  │
+│                       │                     :        :              │
+│     R/W ◀─▶ client SD[]◀══════socket═══════▶[]connected SD ◀─▶ R/W  │
+└───────────────────────┘                     └───────────────────────┘
+            A succesfully connected client-server link
+</div></code></pre>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

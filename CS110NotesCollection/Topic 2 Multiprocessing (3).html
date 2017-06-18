@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Multiproc (3)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-2-multiprocessing-3">Topic 2 Multiprocessing (3)</h1>
+<div id="author-signature">Leedehai</div>
+Friday, April 21, 2017
+<h2 id="25-inter-process-communication-i-pipe">2.5 Inter-process communication I: pipe</h2>
+<h3 id="251-pipe-and-pipe">2.5.1 Pipe and <code>pipe()</code></h3>
+<ul>
+<li><em>Pipe</em> is a one-way condulet that carries <em>byte stream</em>, from a file to another. The two ends of the condulent, i.e. the sending file and the receiving file, are represented by their file descriptors.</li>
+</ul>
+<pre class="hljs"><code><div> ____          out       p   i   p    e       in         ____
+|    |╲        ─────────────────────────────────        |    |╲
+| R  └─| file  ◀───    0 1 0 1 1 0 1 0 1    ◀───  file  | W  └─|
+└──────┘(recv) ───────────────────────────────── (send) └──────┘
+</div></code></pre>
+<ul>
+<li>In POSIX's C extension, <code>dprintf()</code> can be used to write formatted strings to a file designated by a file descriptor (its usage is like <code>fprintf()</code>). Unfortunately, the designers seemed to have forgotten to write &quot;dscanf( )&quot;.</li>
+<li>There is also a system call named <code>pipe()</code>. It takes in a integer array of length two, and fills the array with two newly created file descriptors, <strong>the second file being able to send byte stream to the first</strong>. It returns <code>0</code> on seccess. On error, <code>-1</code> is returned, and <code>errno</code> is properly set.</li>
+</ul>
+<pre class="hljs"><code><div>                 ┌───────┬───────┐ pipe() ┌────────┬────────┐
+    int fds[2]   │       │       │   ==&gt;  │read(R) │write(W)│
+                 └[0]────┴[1]────┘        └[0]─────┴[1]─────┘             
+</div></code></pre>
+<ul>
+<li>Now that the system call <code>fork()</code> faithfully duplicate everything, including file descriptors, we can use <code>pipe()</code> to set up a communication channel between the parent and child process.
+<blockquote>
+<p>Corresponding file descriptors in the parent and the child process <strong>point to the same file</strong> via a shared entry in the system-wide file entry table. So if the parent or the child writes to a sending file, both the parent and child can receive the data from the receiving file. So by <code>fork()</code>, there are 4 channel established.<br> However, note that once data is read from an receiving end, that part of data is gone - it cannot be read again from another receiving end (hence the name <em>stream</em>). So effectively, the parent and child could <strong>race for the data</strong> if they are both reading - which is usually not a good thing.<br> Normally, if you want a bidirectional communication mechanism between the parent and child, you would need to set up two pipes - one for downlink, one for uplink.</p>
+</blockquote>
+</li>
+</ul>
+<pre class="hljs"><code><div>    .PID 101.. ..   .PID 102.. ..       ┌───┬───┐   ┌───┬───┐ file
+    :   ┌───┬───────────┐       :       │ R │ W │   │ R │ W │ desriptor
+        │   │   :   :   │               └─┬─┴─┬─┘   └─┬─┴─┬─┘ tables
+    : ┌─▼─┬─┴─┐       ┌─▼─┬───┐ :         │   └──┬────│───┘  
+      │ R │ W │ :   : │ R │ W │           └─┬────│────┘      
+    : └─▲─┴───┘       └─▲─┴─┬─┘ :           │    │                    
+        │       :   :   │   │          ..─┬─▽──┬─▽──┬─.. file entry    
+    :   └───────────────┴───┘   :         │ &lt;=pipe= │    table   
+    .. parent ...   ... child ...      ..─┴out─┴──in┴─.. (system-wide)  
+
+      two separate FD tables      child shares file entries with parent
+</div></code></pre>
+<h3 id="252-redirect-a-file-descriptor-dup2">2.5.2 Redirect a file descriptor: <code>dup2()</code></h3>
+<ul>
+<li>System call <code>dup2()</code> takes two file descriptors as arguments. It <strong>de-associate</strong>s the second FD and its corresponding file, and <strong>redirect</strong> the second FD to the file pointed to by the first FD.
+<blockquote>
+<p>SIDE NOTE:<br>If the second file descriptor does not exist before, then <code>dup2()</code> will create it, and associate it to the file which the first file descriptor points to.<br> Related system calls: <code>dup()</code>(takes only one FD as argument, returns a new FD that points to the same file) and <code>dup3()</code>(similar to <code>dup2()</code> but takes an option flag as the 3rd argument).</p>
+</blockquote>
+</li>
+<li>On success, these system calls return the second FD (which was passed in as the second argument).  On error, <code>-1</code> is returned, and <code>errno</code> is properly set.</li>
+<li>A <code>dup2()</code> can be used to redirect the standard input/output stream. For example, if we want a process to stop reading from the console stream, but from a given file stream, represented by a file descriptor <code>fdIn</code>, the code is this:<pre class="hljs"><code><div>dup2(fdIn, STDIN_FILENO); <span class="hljs-comment">/* STDIN_FILENO = the stdin stream FD */</span>
+</div></code></pre>
+Thereafter, any read request against the file descriptor STDIN_FILENO (typically <code>0</code>) will still succeed, but by pulling data from the given file, no longer from the console input stream as it did before.<pre class="hljs"><code><div>┌────────────┬────────────┬────────────┐
+│STDIN_FILENO│    ...     │   fdIn     │ file decriptor table
+└──────┬─┬───┴────────────┴─────┬──────┘  (for a process)
+       │ └────────────────────┐ │ 
+       |        △             │ │       
+       X  ─ ─ ─ ┘redirect     │ │
+       |                      │ │                
+   ┌───▼─────┬────────────┬───▼─▼──┐     
+   │ console │    ...     │  given │     file entry table
+   │  input  │            │  file  │       (system wide)
+   └───┬─────┴────────────┴────┬───┘ 
+   ┌───▼─────┬────────────┬────▼───┐     
+   │ console │    ...     │  given │     vnode table
+   │  input  │            │  file  │      (system wide)
+   └─────────┴────────────┴────────┘     
+</div></code></pre>
+Then, we can close the original file descriptor <code>fdIn</code> by using <code>close(fdIn)</code>, so the process can only access the given file through file descriptor <code>STDIN_FILENO</code>.</li>
+<li>Note that the each process's file descriptor table is maintained by the kernel and resides in the kernel space (not in the process's memory space), and identified by the corresponding process's PID. If this process is overwritten by calling <code>execvp()</code>, its file descriptor table remains intact, and the newly-initiated program, which continues to use the old PID, continues to use that table.
+<blockquote>
+<p>That means, if a process redirect its <code>stdin</code> stream (FD = <code>0</code>, which normally should read from console) to another file, and this process is transformed into another program's process by calling <code>execvp()</code>, then the new program's FD <code>0</code> continues to point to the this file, not to the console input as it normally should.</p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>Pause and think for a while: <code>fork()</code>, <code>waitpid()</code>, <code>execvp()</code>, <code>pipe()</code>, <code>dup2()</code> - for each of them:<br>a) what does it do (in one sentence)?<br>b) does it affect the calling process's memory space? If so, how?<br>c) does it affect the calling process's FD table? If so, how?</p>
+</blockquote>
+<blockquote>
+<p>In shell, you can use <code>&lt;</code> and <code>&gt;</code> to redirect standard input/output of a program that is called from a cammand line. For example:<br> <code>$ /bin/sh &lt; Command.txt</code><br><code>$ echo This repo is for CS110 &gt; Readme.txt</code></p>
+</blockquote>
+<h3 id="253-an-example-implementing-subprocess">2.5.3 An example: implementing <code>subprocess()</code></h3>
+<p>Suppose we have an executive named <code>sort</code>, which reads in character strings (separated by newlines and ends by Ctrl+D) from its <code>stdin</code> and sorts those strings in an alphabetic order, and prints them to its <code>stdout</code>.</p>
+<p>Now, we want <code>sort</code> to read hard-coded strings from a program <code>driver</code>, instead of from the console, and outputs the result to the console.</p>
+<blockquote>
+<p>&quot;subprocess&quot; is just another term for &quot;child process&quot;.</p>
+</blockquote>
+<h4 id="2531-analysis">2.5.3.1 Analysis</h4>
+<ul>
+<li>
+<p>The program <code>driver</code> has two functions: <code>main()</code> and <code>subprocess()</code>, implemented in two C files.</p>
+</li>
+<li>
+<p>We let the <code>driver</code> process fork itself, creating an identical child process, and establish a pipe between the parent and the child. The child redirects its <code>stdin</code> stream from the console to the pipe's reading end and uses <code>execvp()</code> to call our program <code>sort</code>.</p>
+</li>
+<li>
+<p>The parent writes data to the pipe and the child (now it is <code>sort</code>'s process) receives it from its <code>stdin</code> file stream, which is connected to the pipe, and outputs the result through <code>stdout</code> stream to the console.</p>
+</li>
+<li>
+<p>We need to <em>seal</em> unused ends of the pip by close the corresponding FD using <code>close()</code>. It prevents accidental reading/writing which may interrupt the byte stream. But if the pipe end is associated with multiple FDs, then the pipe end remains open until all FDs are closed. More importantly, closing a pipe's writing-to end <strong>sends an EOF signal</strong> to the receiver, otherwise the receiver would keep waiting for more input (in console input, EOF is sent by a Ctrl+D).</p>
+</li>
+<li>
+<p>A key observation is that, after <code>execvp()</code>, the process's PID remains the same and its <strong>file descriptor table continues to be effective</strong>, though this process is completely taken by another program.</p>
+</li>
+<li>
+<p>Another note is that, though the <code>main()</code> function calls the <code>subprocess()</code> function, the two functions are still in one process! Functions are just for human - after compilation and linking, they become fused in one routine of instructions and is loaded into the text segment of a process's memory space.</p>
+</li>
+</ul>
+<p>An illustration of the pipe - it has four ends after <code>fork()</code>!</p>
+<pre class="hljs"><code><div> parent      fds[1] (W) ─────────────────────▶ fds[0] (R)                 
+                        ──────────┐    ┌─────▶  &lt;sealed&gt;      
+                                  │    │                               
+                                  │    │                               
+                             ┌────│────┘                                  
+                             │    │          ┌─▷ STDIN_FILENO
+                             │    │          │         
+ child        fds[1] (W) ────┘    └──────────▶ fds[0] (R)    
+              &lt;sealed&gt;   ────────────────────▶ &lt;closed&gt;
+</div></code></pre>
+<p>An illustration of the processes:</p>
+<pre class="hljs"><code><div>          execvp()   &quot;/bin/sh -c /usr/bin/sort&quot;           reaped
+subprocess  ┌──●~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~●─ ─ ○ 
+            │  /bin/sh △ △ △     △ STDIN_FILENO(stdin)  
+            │          : : : via :   ||                 
+driver      │          : : : pipe: fds[1]                 
+────────────┴──────────●─●─●─...─●───────(w a i t)────────────▶
+          fork()       words[i]  EOF(Ctrl+D)
+</div></code></pre>
+<hr>
+<p>The full picture in the shell.</p>
+<pre class="hljs"><code><div>Entry in file entry table: process (FD value), ...
+console input:   shell(0), driver(0), 
+console output:  shell(0), driver(1), /bin/sh(1), /usr/bin/sort(1)
+pipe's in file:  driver(fds[1])
+pipe's out file: /bin/sh(0), /usr/bin/sort(0)
+</div></code></pre>
+<pre class="hljs"><code><div>┴ fork ● event ○ reap                             △ stdout (to console)
+                                                  :
+/usr/bin/sort process   ┌++●**********************●*●- ○
+                        │   △ △ △     △ stdin        
+                        │   : : :     :  ||          
+/bin/sh process ┌~~~●+++┴+++:+:+:+++++:++||++(wait)+++++●─ ○
+                │   /bin/sh : : :     : stdin   
+                │           : : : via :  ||              
+                │           : : : pipe: fds[1]           
+driver   ┌──●~~~┴~~~~~~~~~~~●~●~●~...~●~~~~~~~(w a i t)~~~~~●─ ○ 
+         │  driver          words[i]  EOF                    
+         │                                
+shell ───┴─────────────────────────(w a i t)────────────────────────▶
+</div></code></pre>
+<h4 id="2532-the-code">2.5.3.2 The code</h4>
+<pre class="hljs"><code><div><span class="hljs-comment">/* main.c */</span>
+<span class="hljs-keyword">typedef</span> <span class="hljs-keyword">struct</span> {
+    <span class="hljs-keyword">pid_t</span> pid;    <span class="hljs-comment">/* the subprocess's pid */</span>
+    <span class="hljs-keyword">int</span> supplyfd; <span class="hljs-comment">/* this FD is the writing-to end of the subprocess */</span>
+} <span class="hljs-keyword">subprocess_t</span>;
+
+<span class="hljs-keyword">subprocess_t</span> subprocess(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *command);
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-comment">/* create a subprocess (i.e. child), 
+     * get the subprocess's pid and writing-to end */</span>
+    <span class="hljs-keyword">subprocess_t</span> sp = subprocess(<span class="hljs-string">"/usr/bin/sort"</span>); 
+
+    <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *words[] = { <span class="hljs-comment">/* hard-coded words */</span>
+      <span class="hljs-string">"felicity"</span>, <span class="hljs-string">"umbrage"</span>, <span class="hljs-string">"susurration"</span>, <span class="hljs-string">"halcyon"</span>,
+      <span class="hljs-string">"pulchritude"</span>, <span class="hljs-string">"ablution"</span>, <span class="hljs-string">"somnolent"</span>, <span class="hljs-string">"indefatigable"</span>
+    };
+
+    <span class="hljs-comment">/* write the words to the subprocess through the writing-to end */</span>
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-keyword">sizeof</span>(words); i++) {
+        <span class="hljs-comment">/* note that "%s" format of a char* is the content of the string,
+         * not the value of the pointer itself.
+         */</span>
+        dprintf(sp.supplypid, <span class="hljs-string">"%s\n"</span>, words[i]);
+    }
+
+    <span class="hljs-comment">/* close the writing-to end, 
+     * effectively sending a Ctrl+D (EOF) to the receiver */</span>
+    close(sp.supplypid);
+
+    <span class="hljs-comment">/* wait on the child and reap it - don't make the child an orphan! */</span>
+    <span class="hljs-keyword">int</span> status;
+    <span class="hljs-keyword">pid_t</span> pid = waitpid(sp.pid, &amp;status, <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">return</span> pid == sp.pid &amp;&amp; WIFEXITED(status) ? WEXITSTATUS(status) : <span class="hljs-number">-1</span>;
+}
+</div></code></pre>
+<p>Another function. Note that a new function does NOT correspond to a new process.</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* subprocess.c */</span>
+<span class="hljs-keyword">typedef</span> <span class="hljs-keyword">struct</span> {
+    <span class="hljs-keyword">pid_t</span> pid;    <span class="hljs-comment">/* the subprocess's pid */</span>
+    <span class="hljs-keyword">int</span> supplyfd; <span class="hljs-comment">/* this FD is the writing-to end of the subprocess */</span>
+} <span class="hljs-keyword">subprocess_t</span>;
+
+<span class="hljs-keyword">subprocess_t</span> subprocess(<span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> *command) {
+    <span class="hljs-keyword">int</span> fds[<span class="hljs-number">2</span>];
+    pipe(fds); <span class="hljs-comment">/* setting up a pipe */</span>
+     
+    <span class="hljs-comment">/* create a subprocess, i.e. child process,
+     * and construct a subprocess_t instance to return */</span>
+    <span class="hljs-keyword">subprocess_t</span> sp = {fork(); fds[<span class="hljs-number">1</span>]}; 
+
+    <span class="hljs-keyword">if</span> (sp.pid == <span class="hljs-number">0</span>) { <span class="hljs-comment">/* for the child process */</span>
+      <span class="hljs-comment">/* prevent the child from writing to the pipe */</span>
+      close(fds[<span class="hljs-number">1</span>]);
+
+      <span class="hljs-comment">/* redirect the child's stdin FD to the pipe's reading end,
+         and de-associate fd[0] from the reading end */</span>
+      dup(fds[<span class="hljs-number">0</span>], STDIN_FILENO); 
+      close(fds[<span class="hljs-number">0</span>]);
+
+      <span class="hljs-comment">/* now, execute the intended program (/bin/sh) by execvp() */</span>
+      <span class="hljs-comment">/* since the called program inherits the caller process's FD table,
+       * its stdin stream is connect to the pipe's reading end */</span>
+      <span class="hljs-keyword">char</span> *argv[] = {<span class="hljs-string">"/bin/sh"</span>, <span class="hljs-string">"-c"</span>, (<span class="hljs-keyword">char</span> *) command, <span class="hljs-literal">NULL</span>};
+      execvp(argv[<span class="hljs-number">0</span>], argv);
+
+      <span class="hljs-comment">/* if execvp() succeeds, then /bin/sh reads from the pipe, 
+       * getting the words published by the parent */</span>
+      <span class="hljs-comment">/* if execvp() succeeds, the child process won't reach this line */</span>
+    }
+
+    <span class="hljs-comment">/* if execvp() succeeds, the child process won't reach this line */</span>
+    
+    close(fds[<span class="hljs-number">0</span>]); <span class="hljs-comment">/* prevent the parent from reading from the pipe */</span>
+    <span class="hljs-keyword">return</span> sp;
+}
+</div></code></pre>
+<blockquote>
+<p>Note that if <code>execvp()</code> succeeds, then the rest of the code is NOT executed, as the calling process is completely overwritten and rebooted by another program.</p>
+</blockquote>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

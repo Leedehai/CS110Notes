@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Networking (5)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-4-networking-5">Topic 4 Networking (5)</h1>
+<div id="author-signature">Leedehai</div>
+Wednesday, June 7, 2017
+<h2 id="49-event-driven-programming">4.9 Event-driven programming</h2>
+<blockquote>
+<p><em>Event-driven programming</em> is a programming paradigm in which the flow of the program is determined by events such as user actions (e.g. mouse clicks, key presses), sensor outputs, or messages from other processes/threads, instead of by polling and busy-waiting.<br>In an event-driven application, there is generally a <strong>loop that listens for events, and triggers a callback function when one of those events is detected</strong>. Using hardware interrupts instead of a ceaselessly running loop also achieves this goal (recall your DSP course, huh?).<br><a href="https://nodejs.org/en/about/">Node.js</a> and most <a href="https://developer.apple.com/documentation/appkit">GUI development tools</a> rely on event-driven programming.</p>
+</blockquote>
+<blockquote>
+<p>Event-driven programming is not just used in networking, but we will use networking as an example of its application scenario.</p>
+</blockquote>
+<p>Discuss the epoll suite of functions: epoll_create, epoll_ctl, and epoll_wait.
+Discuss the difference between edge-triggered and level-triggered events.
+Implement an event-driven HTML server using nonblocking I/O in one process and one thread of execution that makes efficent use of the CPU.</p>
+<h3 id="491-multiprocessing-multithreading-vs-non-blocking">4.9.1 Multiprocessing, multithreading v.s. non-blocking</h3>
+<ul>
+<li>Multiprocessing, multithreading
+<ul>
+<li>Pros: achieves parallelism; overcomes blocking system call's problem by allowing the CPU to do other things in the mean time.</li>
+<li>Cons: concurrency issues - dealing with signal blocking/unblocking, avoiding race conditions and deadlocks.</li>
+</ul>
+</li>
+<li>Non-blocking I/O:
+<ul>
+<li>Pros: manage multiplexing manually - agile; single process/thread, so no concurrency issues.</li>
+<li>Cons: manage multiplexing manually - more work for programmer; busy-waiting, so CPU time is wasted.</li>
+</ul>
+</li>
+</ul>
+<h3 id="492-get-rid-of-busy-waiting-in-non-blocking-io">4.9.2 Get rid of busy-waiting in non-blocking I/O</h3>
+<p><code>epoll</code> is a library of Linux routines that help non-blocking servers yield the processor until it knows there's work to be done with one or more of the open client connections.</p>
+<blockquote>
+<p><code>epoll</code> (&quot;event polling&quot;) is available on Ubuntu, but may not be available on other Linux releases. <code>kqueue</code> is an alternative to <code>epoll</code>.</p>
+</blockquote>
+<ul>
+<li><code>epoll_create()</code>, which creates something called a <strong>watch set</strong>, which itself is a set of file descriptors which we'd like to monitor. The return value is itself a file descriptor used to identify a watch set. Because it's a file descriptor, watch sets can contain other watch sets.</li>
+<li><code>epoll_ctl()</code> is a control function that allows us to add descriptors to a watch set, remove descriptors from a watch set, or reconfigure file descriptors already in the watch set.</li>
+<li><code>epoll_wait()</code> waits for I/O events on the watch set, blocking the calling thread until one or more events are detected.</li>
+</ul>
+<p>This is the new server that utilizes non-blocking I/O to handle multiple clients but is without busy-waiting.</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/**
+ * File: efficient-server.cc
+ * -------------------------
+ * Simple application that relies on nonblocking
+ * I/O and the suite of epoll functions to
+ * implement an event-driven web-server.
+ */</span>
+
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;map&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;                    /* for close() */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/epoll.h&gt;                 /* for epoll functions */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/types.h&gt;                 /* for accept() */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/socket.h&gt;                /* for accept() */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;                    /* for strerror */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"server-socket.h"</span>             <span class="hljs-comment">/* for createServerSocket() */</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"non-blocking-utils.h"</span>        <span class="hljs-comment">/* for setAsNonBlocking() */</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-comment">/**
+ * Function: buildEvent
+ * --------------------
+ * Populates the only two fields of an epoll_event struct that
+ * matter to us, and returns a copy of it to the call site.
+ * The events flag is really a set of flags stating what
+ * event types and behaviors we're interested in for a file
+ * descriptor, and fd is the file descriptor being registered.
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">struct</span> epoll_event <span class="hljs-title">buildEvent</span><span class="hljs-params">(<span class="hljs-keyword">uint32_t</span> events, <span class="hljs-keyword">int</span> fd)</span> </span>{
+  <span class="hljs-keyword">struct</span> epoll_event event;
+  event.events = events;
+  event.data.fd = fd;
+  <span class="hljs-keyword">return</span> event;
+}
+
+<span class="hljs-comment">/**
+ * Function: acceptNewConnections
+ * ------------------------------
+ * Called when the kernel detects a read-oriented event
+ * on the server socket (which is always in the watch set).
+ *
+ * In theory, many incoming requests (e.g. one or more) may have
+ * accumulated in the time it took for the kernel to detect even the first one,
+ * and because the server socket was registered for edge-triggered
+ * event notification (e.g. via the EPOLLET bit being set), we are
+ * required to accept each and every one of those incoming connections
+ * before returning.  Each of those client connections needs to made
+ * nonblocking and then added to the watch set (in edge-triggered mode,
+ * initially for read events, since we need to ingest the request header
+ * before responding).
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">acceptNewConnections</span><span class="hljs-params">(<span class="hljs-keyword">int</span> ws, <span class="hljs-keyword">int</span> server)</span> </span>{
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-keyword">int</span> clientSocket = accept4(server, <span class="hljs-literal">NULL</span>, <span class="hljs-literal">NULL</span>, SOCK_NONBLOCK);
+    <span class="hljs-keyword">if</span> (clientSocket == <span class="hljs-number">-1</span>) <span class="hljs-keyword">return</span>;
+    <span class="hljs-keyword">struct</span> epoll_event info = buildEvent(EPOLLIN | EPOLLET, clientSocket);
+    epoll_ctl(ws, EPOLL_CTL_ADD, clientSocket, &amp;info);
+  }
+}
+
+<span class="hljs-comment">/**
+ * Function: consumeAvailableData
+ * ------------------------------
+ * Reads in as much available data from the supplied client socket
+ * until it either would have blocked, or until we have enough of the
+ * response header (e.g. we've read up through a "\r\n\r\n") to respond.
+ * Because the client sockets were registered for edge-triggered read events,
+ * we need to consume *all* available data before returning, else epoll_wait
+ * will never surface this client socket again.
+ */</span>
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">size_t</span> kBufferSize = <span class="hljs-number">1</span>;
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span> <span class="hljs-title">kRequestHeaderEnding</span><span class="hljs-params">(<span class="hljs-string">"\r\n\r\n"</span>)</span></span>;
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">consumeAvailableData</span><span class="hljs-params">(<span class="hljs-keyword">int</span> ws, <span class="hljs-keyword">int</span> client)</span> </span>{
+  <span class="hljs-keyword">static</span> <span class="hljs-built_in">map</span>&lt;<span class="hljs-keyword">int</span>, <span class="hljs-built_in">string</span>&gt; requests; <span class="hljs-comment">// tracks what's been read in thus far over each client socket</span>
+  <span class="hljs-keyword">size_t</span> pos = <span class="hljs-built_in">string</span>::npos;
+  <span class="hljs-keyword">while</span> (pos == <span class="hljs-built_in">string</span>::npos) {
+    <span class="hljs-keyword">char</span> buffer[kBufferSize];
+    <span class="hljs-keyword">ssize_t</span> count = read(client, buffer, kBufferSize);
+    <span class="hljs-keyword">if</span> (count == <span class="hljs-number">-1</span> &amp;&amp; errno == EWOULDBLOCK) <span class="hljs-keyword">return</span>; <span class="hljs-comment">// not done reading everything yet, so return and expect to be called later</span>
+    <span class="hljs-keyword">if</span> (count &lt;= <span class="hljs-number">0</span>) { close(client); <span class="hljs-keyword">break</span>; } <span class="hljs-comment">// passes? then bail on connection, as it's borked</span>
+    requests[client] += <span class="hljs-built_in">string</span>(buffer, buffer + count);
+    pos = requests[client].find(kRequestHeaderEnding);
+    <span class="hljs-keyword">if</span> (pos == <span class="hljs-built_in">string</span>::npos) <span class="hljs-keyword">continue</span>;
+    <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Num Active Connections: "</span> &lt;&lt; requests.size() &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-built_in">cout</span> &lt;&lt; requests[client].substr(<span class="hljs-number">0</span>, pos + kRequestHeaderEnding.size()) &lt;&lt; flush;
+    <span class="hljs-keyword">struct</span> epoll_event info = buildEvent(EPOLLOUT | EPOLLET, client);
+    epoll_ctl(ws, EPOLL_CTL_MOD, client, &amp;info); <span class="hljs-comment">// MOD == modify existing event</span>
+  }
+  
+  requests.erase(client);
+}
+
+<span class="hljs-comment">/**
+ * Function: publishResponse
+ * -------------------------
+ * Called on behalf of the specified client socket whenever the
+ * kernel detects that we're able to write to it (and we're interested
+ * in writing to it).
+ *
+ * This implementation should be more elaborate, but we can get away
+ * with pretending the provided client socket is blocking instead of 
+ * non-blocking because the string we write to it is so incredibly short.
+ * A more robust implementation would check the return value to see how
+ * much of the payload was actually accepted, keep calling write until
+ * -1 was returned, etc.
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-built_in">string</span> <span class="hljs-title">kResponseString</span><span class="hljs-params">(<span class="hljs-string">"HTTP/1.1 200 OK\r\n\r\n&lt;b&gt;Thank you for your request! We're working on it! No, really!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;&lt;img src=\"http://vignette3.wikia.nocookie.net/p__/images/e/e0/Agnes_Unicorn.png/revision/latest?cb=20160221214120&amp;path-prefix=protagonist\"/&gt;"</span>)</span></span>;
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">publishResponse</span><span class="hljs-params">(<span class="hljs-keyword">int</span> client)</span> </span>{
+  write(client, kResponseString.c_str(), kResponseString.size());
+  close(client);
+}
+
+<span class="hljs-comment">/**
+ * Function: buildInitialWatchSet
+ * ------------------------------
+ * Creates an epoll watch set around the supplied server socket.  We
+ * register an interested in being notified when the server socket is
+ * available for read (and accept) operations via EPOLLIN, and we also
+ * note that the event notificiations should be edge triggered (EPOLLET)
+ * which means that we'd only like to be notified that data is available
+ * to be read when the kernel is certain there is data.
+ */</span>
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kMaxEvents = <span class="hljs-number">64</span>;
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">buildInitialWatchSet</span><span class="hljs-params">(<span class="hljs-keyword">int</span> server)</span> </span>{
+  <span class="hljs-keyword">int</span> ws = epoll_create(<span class="hljs-comment">/* ignored parameter = */</span> kMaxEvents); <span class="hljs-comment">// value is ignored nowadays, but must be positive</span>
+  <span class="hljs-keyword">struct</span> epoll_event info = buildEvent(<span class="hljs-comment">/* events = */</span> EPOLLIN | EPOLLET, <span class="hljs-comment">/* fd = */</span> server);
+  epoll_ctl(ws, EPOLL_CTL_ADD, server, &amp;info);
+  <span class="hljs-keyword">return</span> ws;
+}
+
+<span class="hljs-comment">/**
+ * Function: runServer
+ * -------------------
+ * Converts the supplied server socket to be nonblocking, constructs
+ * the initial watch set around the server socket, and then enter the
+ * wait/response loop, blocking with each iteration until the kernel
+ * detects something interesting happened to one or more of the
+ * descriptors residing within the watch set.  The call to epoll_wait
+ * is the only blocking system call in the entire (single-thread-of
+ * -execution) web server.
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">runServer</span><span class="hljs-params">(<span class="hljs-keyword">int</span> server)</span> </span>{
+  setAsNonBlocking(server);
+  <span class="hljs-keyword">int</span> ws = buildInitialWatchSet(server);
+  <span class="hljs-keyword">struct</span> epoll_event events[kMaxEvents];
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+    <span class="hljs-keyword">int</span> numEvents = epoll_wait(ws, events, kMaxEvents, <span class="hljs-comment">/* timeout = */</span> <span class="hljs-number">-1</span>);
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; numEvents; i++) {
+      <span class="hljs-keyword">if</span> (events[i].data.fd == server) {
+        acceptNewConnections(ws, server);
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (events[i].events &amp; EPOLLIN) { <span class="hljs-comment">// we're still reading the client's request</span>
+        consumeAvailableData(ws, events[i].data.fd);
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (events[i].events &amp; EPOLLOUT) { <span class="hljs-comment">// we've read in enough of the client's request to respond</span>
+        publishResponse(events[i].data.fd);
+      }
+    }
+  }
+}
+
+<span class="hljs-comment">/**
+ * Function: main
+ * --------------
+ * Provides the entry point for the entire server.  The implementation
+ * of main just passes the buck to runServer.
+ */</span>
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">short</span> kDefaultPort = <span class="hljs-number">33333</span>;
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> **argv)</span> </span>{
+  <span class="hljs-keyword">int</span> server = createServerSocket(kDefaultPort);
+  <span class="hljs-keyword">if</span> (server == kServerSocketFailure) {
+    <span class="hljs-built_in">cerr</span> &lt;&lt; <span class="hljs-string">"Failed to start server.  Port "</span> &lt;&lt; kDefaultPort &lt;&lt; <span class="hljs-string">" is probably already in use."</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+  }
+  
+  <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"Server listening on port "</span> &lt;&lt; kDefaultPort &lt;&lt; <span class="hljs-built_in">endl</span>;
+  runServer(server);
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

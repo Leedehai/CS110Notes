@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Multithrd (5)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-3-multithreading-5">Topic 3 Multithreading (5)</h1>
+<div id="author-signature">Leedehai</div>
+Friday, May 19, 2017
+<h2 id="39-concurrency-patterns">3.9 Concurrency patterns</h2>
+<blockquote>
+<p>There’s value in learning programming patterns — patterns such as linear search, or divide-and-conquer—that can be generalized and used in other programs. Similarly, it might be helpful to describe the common concurrency patterns managed by the <code>thread</code>, the <code>mutex</code>, and our custom <code>semaphore</code> (together with <code>conditional_variable_any</code>).  Hopefully, these descriptions can help you identify some of the ways <code>mutexe</code>s and <code>semaphore</code>s are used, and give you some insight into what options you have for solving different concurrency and threading cases:<br>Binary lock, Generalized counter, Binary rendezvous, Generalized rendezvous, Layered construction.</p>
+</blockquote>
+<h3 id="391-binary-lock">3.9.1 Binary lock</h3>
+<p><strong>Mechanism</strong>: The <code>mutex</code> is used as a single-owner lock. When constructed, it is in an unlocked state and threads bracket critical regions with matched <code>lock()</code> and <code>unlock()</code> calls on the <code>mutex</code> object.</p>
+<p><strong>Application</strong>: This sort of concurrency pattern is used to lock down sole access to some shared state or resource that only one thread can be manipulating at any one time.</p>
+<h3 id="392-generalized-counter">3.9.2 Generalized counter</h3>
+<p><strong>Mechanism</strong>: A <strong>semaphore</strong> is used to track some resource instances, be it a number of empty buffers, full buffers, available network connection, or what have you. The <code>semaphore</code> is essentially an integer count, capitalizing on its atomic increment, decrement, and the efficient blocking when a decrement is levied against a zero.</p>
+<p>The semaphore is constructed to the initial count on the resource (sometimes <code>0</code>, sometimes a positive integer — it depends on the situation). As a thread requires an instance of resource, it calls <code>wait()</code> on the <code>semaphore</code> object responsible for that set of resource instances, so that it can transactionally consume a resource instance upon waking from that wait. Other threads (possibly, but not necessarily the same thread that consumes) <code>signal()</code> this <code>semaphore</code> object when a new resource instance becomes available.</p>
+<p><strong>Application</strong>: This sort of pattern is used to efficiently coordinate shared use of a limited resource that has a discrete quantity.  It can also be used to limit throughput (such as in the Dining Philosophers problem) where unmitigated contention might otherwise lead to deadlock.</p>
+<h3 id="393-binary-rendezvous">3.9.3 Binary rendezvous</h3>
+<p><strong>Mechanism</strong>: The <code>semaphore</code> can be used to coordinate cross-thread communication.  Suppose thread <code>A</code> needs to know when thread <code>B</code> has finished some task before it itself can progress any further. Rather than having <code>A</code> repeatedly loop (i.e. busy wait) and check some global state, a binary rendezvous can be used to foster communication between the two.  The rendezvous <code>semaphore</code> object is initialized to <code>0</code>.  When <strong>thread</strong> A gets to the point that it needs to know that another thread has made enough progress, it can <code>wait()</code> on the rendezvous <code>semaphore</code> object.  After completing the necessary task, <code>B</code> will <code>signal()</code> this object.</p>
+<p>If <code>A</code> gets to the rendezvous point before <code>B</code> finishes the task, it will block until <code>B</code>'s <code>signal()</code>. If <code>B</code> finishes the task first, it calls <strong>signal()</strong> on the semaphore object, efficiently recording that the task is done, and when <code>A</code> gets to the <code>wait()</code>, it will be sail right through it. This binary rendezvous <code>semaphore</code> obejct records the status of one event and only ever takes on the value <code>0</code> (not-yet-completed or completed-and-checked) and <code>1</code> (completed-but-not-yet-checked).</p>
+<p><strong>Application</strong>: This concurrency pattern is sometimes used to wakeup another thread (such as disk reading thread that should spring into action when a request comes in), or to coordinate two dependent actions (a print job request that can't complete until the paper is refilled), and so forth.</p>
+<p>If you need a bidirectional rendezvous where both threads need to wait for the other, you can add another <code>semaphore</code> object in the reverse direction (i.e. the <code>wait()</code> and <code>signal()</code> calls inverted). Be careful that both threads don’t try to wait for the other first and signal afterwards, else you can quickly arrive at deadlock!</p>
+<h3 id="394-generalized-rendezvous">3.9.4 Generalized rendezvous</h3>
+<p><strong>Mechanism</strong>: Generalized rendezvous is a combination of binary rendezvous and generalized counter, where a single <code>semaphore</code> object is used to record how many times something has occurred. For example, if thread <code>A</code> spawned <code>N</code> thread <code>B</code>s and needs to wait for <strong>all</strong> of them make a certain amount of progress (not necessarily exiting) before <code>A</code> itself advancing, a generalized rendezvous might be used.</p>
+<p>The <code>semaphore</code> object is initialized to <code>0</code>.  When <code>A</code> needs to sync up with the others, it will call <code>wait()</code> on the <code>semaphore</code> object in a loop, one iteration step for each thread it is syncing up with. <code>A</code> doesn't care which specific thread of the group has finished - it just cares about whether <strong>all</strong> of <code>B</code> threads have finished. If <code>A</code> gets to <code>wait()</code> before the <code>B</code> threads have finished, it will block, waking to &quot;count&quot; each child as the child calls <code>signal()</code>, and eventually move on when all dependent threads have checked back. If all the <code>B</code> threads finish before <code>A</code> arrives at <code>wait()</code>, <code>A</code> will quickly decrement the already-incremented-for-many-times <code>semaphore</code> object, once for each <strong>thread</strong>, and move on without blocking. The current value of the generalized rendezvous <code>semaphore</code> object gives you a count of the number of tasks that have completed that haven't yet been checked, and it will be somewhere between <code>0</code> and <code>N</code> at all times.</p>
+<p><strong>Application</strong>: The generalized rendezvous pattern is most often used to regroup after some divided task, such as waiting for several network requests to complete, or blocking until all pages in a print job have been printed.</p>
+<blockquote>
+<p>As with the generalized counter, it’s occasionally possible to use <code>thread::join()</code> instead of <code>semaphore::wait()</code>, but that requires the child threads to fully exit to &quot;notify&quot; the parent thread, and that’s not always what you want (though if it is, then <code>thread::join()</code> is just fine).</p>
+</blockquote>
+<h3 id="395-layered-construction">3.9.5 Layered construction</h3>
+<p>Once you have the basic patterns down, you can start to think about how <code>mutex</code>es and <code>semaphore</code>s can be layered and grouped into more complex constructions.</p>
+<p>Consider, for example, the constrained dining philosopher solution in which a generalized counter is used to limit throughput, and <code>mutex</code>es are used for each of the forks. Another layered construction might be a global integer counter with a <code>mutex</code> lock and a binary rendezvous <code>semaphore</code> object that can do something similar to that of a generalized rendezvous <code>semaphore</code> object. As tasks complete, they can each lock and decrement the global counter, and when the counter gets to <code>0</code>, a single <code>signal()</code> can be sent by the last thread to finish.</p>
+<p>The combination of <code>mutex</code> and binary rendezvous <code>semaphore</code> could be used to set up a &quot;race&quot;: thread <code>C</code> <code>wait()</code>s for the first of threads <code>A</code> and <code>B</code> to <code>signal()</code>. threads <code>A</code> and <code>B</code> each compete to be the one who calls <code>signal()</code> on the rendezvous <code>semaphore</code> object. Thread <code>C</code> only expects exactly one <code>signal()</code>, so the <code>mutex</code> lock is used to provide critical-region access so that only the first thread calls <code>signal()</code>, but not the second.</p>
+<h2 id="310-example-ice-cream-parlor">3.10 Example: ice cream parlor</h2>
+<blockquote>
+<p>A example in which multiple thread classes are involved - a possible situation in real-world programming!</p>
+</blockquote>
+<blockquote>
+<p>This example originates from CS107 in 1990s <img class="emoji" title=":smiley:" alt=":smiley:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f603.png" allign="absmiddle" /></p>
+</blockquote>
+<blockquote>
+<p>A nice-to-know: in C++, there is a template class named <code>atomic&lt;&gt;</code>, which ensures some operations on the instantiated object is transactional, i.e. this template class carries a <code>mutex</code> within it so you don't need to manually manage the lock. Click <a href="http://www.cplusplus.com/reference/atomic/atomic/">here</a> for details.</p>
+</blockquote>
+<p>This program simulates the daily activity in an ice cream store. The simulation’s actors are:</p>
+<ul>
+<li>the customers who buy ice cream cones,</li>
+<li>the clerks who make ice cream cones,</li>
+<li>the single manager who supervises,</li>
+<li>the single cashier who accepts payment from customers.</li>
+</ul>
+<p>A different thread is launched for each of these actors.</p>
+<h3 id="3101-scenario-description">3.10.1 Scenario description</h3>
+<p><strong>Customer</strong>s: each customer orders a number of ice cream cones, waits for them to be made, gets in line to pay, and then leaves (terminates). Customers are in a big hurry and don’t want to wait for one clerk to make several cones, so each customer dispatches one clerk thread for each ice cream cone he/she orders. Once the customer has all ordered ice cream cones, he/she gets in line at the cashier and waits to pay, in FIFO order.  After paying, each customer leaves (terminates).</p>
+<p><strong>Clerk</strong>s: each clerk thread delivers exactly one ice cream cone. The clerk scoops up a cone and then has the manager take a look at it to make sure it is absolutely perfect. If the cone doesn't pass the manager's test, it is thrown away and the clerk makes another one. Once an ice cream cone is approved by the manager, the clerk hands that ice cream cone to the customer, and the clerk leaves (teminates).</p>
+<p><strong>Manager</strong>: the single manager sits idly until a clerk needs his or her freshly scooped ice cream cone inspected.  When the manager hears of a request for an inspection, the manager determines if it the cone is deliverable to the customer. The manager leaves done when all orders from all customers have been delivered.</p>
+<p><strong>Cashier</strong>: the cashier idles while there are no customers in line. When a customer is ready to pay, the cashier handles the bill. Once the bill is paid, that customer leaves. The cashier should handle the customers in a FIFO manner. Once all customers have paid, the cashier leaves (terminates).</p>
+<h3 id="3102-analysis">3.10.2 Analysis</h3>
+<h3 id="3103-the-code">3.10.3 The code</h3>
+<p>There is a handout for it: Multithreading and Synchronization Redux.pdf. Maybe I will write notes on it if I have time..</p>
+
+        </article>
+    </body>
+</html>

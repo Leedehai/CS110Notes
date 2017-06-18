@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Multiproc (1)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-2-multiprocessing-1">Topic 2 Multiprocessing (1)</h1>
+<div id="author-signature">Leedehai</div>
+Friday, April 14, 2017
+<blockquote>
+<p>A <em>process</em> is an instance of a computer program that is being executed. <em>Multitasking</em> is a method to allow multiple processes to share processors (CPUs) and other system resources. <br> By the way, a <em>thread</em> of execution is the smallest sequence of instructions that can be managed independently by the OS. Multiple threads can exist within one process, executing <em>concurrently</em> and sharing the executable code, variable values, and resources such as memory, while different processes do not share them.</p>
+</blockquote>
+<h2 id="21-mitosis-fork">2.1 Mitosis: <code>fork()</code></h2>
+<h3 id="211-overview">2.1.1 Overview</h3>
+<ul>
+<li>
+<p>The system call <code>fork()</code> clones the calling process, create an <strong>identical copy</strong> of it in memory, and schedule it <strong>as if this copy of the original were running all along</strong>. All segments (data, bss, init, stack, heap, text) are faithfully replicated, and all file descriptors are copied to the clone.</p>
+<blockquote>
+<p>&quot;as if this copy of the original were running all along&quot; means the program counter points to the <strong>same instruction</strong> in the clone as in the original, and all data that exists in the original before the moment of <code>fork()</code> are copied.</p>
+</blockquote>
+<blockquote>
+<p>&quot;all file descriptors are copied to the clone&quot; means that a copied file descriptor represents the <strong>same file entry</strong> in the system-wide file entry table as the original one does, and the two file descriptors equal in value.</p>
+</blockquote>
+<blockquote>
+<p>Obviously, <code>fork()</code> is a deep copy, not a shallow copy.</p>
+</blockquote>
+<blockquote>
+<p>On a modern OS, <code>fork()</code> may adopt a copy-on-write strategy (lazy copy).</p>
+</blockquote>
+</li>
+<li>
+<p>The only difference: <code>fork()</code>'s <strong>return value</strong> in the new process (the child) is <strong>0</strong>, and <code>fork()</code>'s return value in the spawning process (the parent) is the <strong>child's process id</strong> on success (<code>-1</code> on failure). The return value can be used to dispatch each of the two processes in a different routine.</p>
+</li>
+<li>
+<p>As a result, if in a program's code it executes <code>fork()</code> once, the output of the whole program is really the output of two processes. If twice, then four processes. The output's <strong>order is unpredictable</strong> in that it is dependent on the kernel's scheduler, and they might even run in parallel on a multicore machine.</p>
+</li>
+<li>
+<p>A nice diagram to illustrate:</p>
+</li>
+</ul>
+<pre class="hljs"><code><div>                                                            children
+                                                           ┌────────▶
+                        child                              │       
+                ┌────────────────▶                  ┌──────┴────────▶
+                │                                   │              
+                │                                   │      ┌────────▶
+  parent        │      parent             parent    │      │       
+────────────────┴────────────────▶     ─────────────┴──────┴────────▶
+              fork()                             fork()   fork()
+                          time ──▶                           time ──▶
+     the program forks once                 the program forks twice
+</div></code></pre>
+<blockquote>
+<p>The system call <code>fork()</code> is not a nobody. On Unix, almost every process is created by <code>fork()</code>.</p>
+</blockquote>
+<h3 id="212-an-example">2.1.2 An example</h3>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;      // for bool</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;        // for printf</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;       // for fork, getpid, getppid</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Greetings from process pid = %d (parent pid = %d)\n"</span>, 
+            getpid(), getppid());
+
+    <span class="hljs-keyword">pid_t</span> pid = fork();
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Bye bye from process pid = %d (parent pid = %d)\n"</span>, 
+           getpid(), getppid());
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>Note: system calls <code>getpid()</code> and <code>getppid()</code> gets the current process's process ID and its parent's process ID, respectively. The return type is essentially an integer. The parent ID is usually smaller than the child's ID.</p>
+<h3 id="213-explosive-fork-graphs">2.1.3 Explosive <code>fork()</code> graphs</h3>
+<p>Be aware of <code>fork()</code>'s spawning power. It may be used in a computer virus.</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;     // for fork</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;      // for printf, etc</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;     // for strlen</span></span>
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> <span class="hljs-keyword">const</span> *kTrail = <span class="hljs-string">"abcd"</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kForkFail = <span class="hljs-number">1</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Let the forking begin.\n"</span>);
+  <span class="hljs-keyword">size_t</span> trailLength = <span class="hljs-built_in">strlen</span>(kTrail);
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; trailLength; i++) {
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%c\n"</span>, kTrail[i]);
+    <span class="hljs-keyword">pid_t</span> pid = fork();
+  }
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"\n"</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>Ouptut: 1 <code>a</code>, 2 <code>b</code>'s, 4 <code>c</code>'s, 8 <code>d</code>'s，16 running processes.</p>
+<blockquote>
+<p>Note that the terminal's prompt may be printed in the middle of the output letter string, because when the parent process (the one that is initiated directly from the terminal) returns, it causes the terminal to print a prompt line, paying no attention to the other running child processes.</p>
+</blockquote>
+<p>Illustration (a binary tree, no surprise):</p>
+<pre class="hljs"><code><div>                                             ┌─────────▶ 
+                                     ┌──'d'──┴─────────▶ 
+                                     │       ┌─────────▶ 
+                             ┌──'c'──┴──'d'──┴─────────▶ 
+                             │               ┌─────────▶        
+                             │       ┌──'d'──┴─────────▶ 
+                             │       │       ┌─────────▶ 
+                     ┌──'b'──┴──'c'──┴──'d'──┴─────────▶   
+                     │                       ┌─────────▶   
+                     │               ┌──'d'──┴─────────▶ 
+                     │               │       ┌─────────▶  
+                     │       ┌──'c'──┴──'d'──┴─────────▶  
+                     │       │               ┌─────────▶ 
+                     │       │       ┌──'d'──┴─────────▶  
+                     │       │       │       ┌─────────▶ 
+        ────────'a'──┴──'b'──┴──'c'──┴──'d'──┴─────────▶
+</div></code></pre>
+<p>Note that this illustration doesn't account for the kernel's scheduler, so these processes seem to be running in parallel - in reality, it might not be the case.</p>
+<h2 id="22-block-and-wait-waitpid">2.2 Block and wait: <code>waitpid()</code></h2>
+<h3 id="221-an-overview">2.2.1 An overview</h3>
+<ul>
+<li>This system call instructs a process to block until another process changes its state. It is a way to <strong>synchronize</strong> the parent and child process.</li>
+<li><code>pid_t waitpid(pid_t pid, int *status, int options)</code></li>
+<li>The first argument specifies the wait set. If it is positive, it indicates the process ID of the child process. If it is <code>-1</code>, the system call waits for any child process. If it is other negatives, then the absolute value of this negative indicates a process group's ID.
+<blockquote>
+<p>Process group: every process belongs to exactly one process group, which is identified by a positive integer process group ID. By default, a child process belongs to the same process group as its parent. You may examine a process's pgid by system call <code>getpgid()</code>. You may also set a process's pgid via system call <code>int setpgid(pid_t pid, pid_t pgid);</code> (you may see <a href="http://www.tutorialspoint.com/unix_system_calls/setpgid.htm">here</a> for more).</p>
+</blockquote>
+</li>
+<li>The second argument is the address of an integer where child termination status information can be written in (it can be <code>NULL</code> if we don't care to get that status). You may turn to <a href="http://www.tutorialspoint.com/unix_system_calls/waitpid.htm">this page</a> for more info on the status integer.</li>
+<li>The third argument is an option flag. If it is <code>0</code>, then <code>waitpid()</code> should only return when a child exits. If it is <code>WNOHANG</code>, then <code>waitpid()</code> will immediately return <code>0</code> without blocking if there is no undiscovered terminated child. For more complicated options, you can see <a href="http://www.tutorialspoint.com/unix_system_calls/waitpid.htm">here</a>.</li>
+<li>The return value is the process ID of the child process that changes state. If <code>waitpid()</code> was called but there were no such child process(es) as indicated by the first argument to wait on, or if it encounters an error, it will returns <code>-1</code> and automatically sets <code>errno</code> to indicate the reason (setting <code>errno</code> to <code>ECHILD</code> indicates the former case).
+<blockquote>
+<p>A number of other system calls also use the global variable <code>errno</code> to indicate the reason of failure. <code>errno</code> always store the error number set by the most recent failed system call.</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="222-an-example">2.2.2 An example</h3>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdbool.h&gt;  // for bool</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;   // for fork</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;    // for printf, etc</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/wait.h&gt; // for waitpid</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;time.h&gt;     // for time</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-keyword">pid_t</span> pid = fork();
+  <span class="hljs-keyword">bool</span> isParent = (pid != <span class="hljs-number">0</span>);
+
+  <span class="hljs-comment">/* force exactly one of the two to sleep */</span>
+  <span class="hljs-keyword">if</span> ((random() % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>) == isParent) sleep(<span class="hljs-number">1</span>); 
+
+  <span class="hljs-comment">/* parent waits on the child to exit; child waits on no one */</span>
+  <span class="hljs-keyword">if</span> (isParent) waitpid(pid, <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>);
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"I am printed from the %s).\n"</span>, isParent  ? <span class="hljs-string">"parent"</span> : <span class="hljs-string">"child"</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>The program above seduces one of the two processes (parent and child) to sleep for 1 second, using a coin-toss. This allows the other process to have time to print.</p>
+<p>In this program, the parent process waits on the child to exit before it allows itself to exit (akin to a parent not being able to rest until he or she knows the child has).</p>
+<p>Note that final <code>printf()</code> gets executed twice. <strong>The child is always the first to execute it</strong>, however, because the parent is blocked by <code>waitpid()</code> until the child exits.</p>
+<h3 id="223-a-more-complicated-example-divert-the-routine">2.2.3 A more complicated example: divert the routine</h3>
+<p>You can use the return value of <code>fork()</code> and/or the output status integer to implement different routines for different cases.</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/wait.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;errno.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-keyword">pid_t</span> pid = fork();
+  <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) { <span class="hljs-comment">/* child's routine */</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"I am the child, and the parent will wait up for me.\n"</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">110</span>; <span class="hljs-comment">// return something, a contrived number here</span>
+  }
+  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (pid != <span class="hljs-number">0</span>) { <span class="hljs-comment">/* parent's routine */</span>
+    <span class="hljs-keyword">int</span> status;
+    pid = waitpid(pid, &amp;status, <span class="hljs-number">0</span>)
+    <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">-1</span> &amp;&amp; errno = ECHILD) {
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">"The specified pid does not exist"</span>);
+    }
+    <span class="hljs-keyword">if</span> (WIFEXITED(status)) {
+      <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Child exited with status %d.\n"</span>, WEXITSTATUS(status));
+    }
+    <span class="hljs-keyword">else</span> {
+      <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Child terminated abnormally.\n"</span>);
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+  }
+}
+</div></code></pre>
+<p>Here <code>status</code> is populated by the <code>waitpid()</code>. <code>WIFEXITED(status)</code> returns <code>true</code> if the child process exits normally by examining the higher bits of <code>ststus</code>; <code>WEXITSTATUS(status)</code> returns the least significant 16-8 bits of the return value of the child process (<code>110</code> here) if the child exits normally.</p>
+<h3 id="224-some-loose-ends">2.2.4 Some loose ends</h3>
+<p>Q: What if the child process runs so quick that it completes before the parent process reaches the instruction of <code>waitpid()</code>? What will <code>waitpid()</code> return?</p>
+<p>A: In this case, <code>waitpid()</code> will still return normally (and immediately without waiting), indicating the child process was terminated. Though the child process completes before <code>waitpid()</code> gets executing, the cue of the child's status change is still there to be read.</p>
+<blockquote>
+<p>In fact, a child that terminates, but has not been waited for becomes a <em>zombie</em>. The kernel maintains a minimal set of information about zombie processes (PID, termination status, resource usage information) in order to allow the parent to later obtain information about the child. Completely de-allocating the resources occupied by a terminated process (&quot;zombie&quot;) is termed <em>reaping</em>.</p>
+</blockquote>
+<pre class="hljs"><code><div>                                .....            
+                               O O  /            
+                              /&lt;   /             
+               ___ __________/_#__=o                    ,
+              /(- /(\_\________   \                     ',' ,  
+              \ ) \ )_      \o     \                      ', ', 
+              /|\ /|\       |'     |                        |  |
+                            /o   __\                        |  |
+                           / '     |                       ,' ,'
+                         /_/\______|                      ,' ,'
+                        (   _(    &lt;           / ~-.___ .-'  ,' 
+                         \    \    \        /   .______.- ~              
+                           \____\___\      /   /'      
+                           ____\_\___\      \./      
+                         |___ |_______|.. .
+                        
+                          Reap a zombie.   
+</div></code></pre>
+<hr>
+<p>Q: If a child process terminates (and therefore becomes a &quot;zombie&quot;), will <code>waitpid()</code> reap that zombie?</p>
+<p>A: Yes. Performing a wait allows the system to release the resources associated with the child.</p>
+<hr>
+<p>Q: Is it possible that the child process begins after the parent has already stepped into the <code>waitpid()</code> call?</p>
+<p>A: Entirely possible. The kernel's scheduler is responsible for determining the temporal interleaving of the instructions of different processes. If the scheduler was designed so badly that it won't perform a context switch to the child process until the parent's <code>waitpid()</code> completes, then the parent is trapped in its <code>waitpid()</code> call forever, since the child process never has a chance to complete.</p>
+<hr>
+<p>Q: What is a child process's &quot;status change&quot;?</p>
+<p>A: The running/stopped child terminated (either normally or by signal); the running child was stopped by a signal (e.g. by signal <code>SIGTRAP</code> or <code>SIGTSTP</code>, <code>SIGSTOP</code>); a stopped child was prompted to continue by a signal (e.g. by <code>SIGCONT</code>).</p>
+<hr>
+<p>Q: What if a parent process terminates without waiting for its child process to complete, and terminates before the child process?</p>
+<p>A: Then the child process is regarded as an <em>orphan process</em>. A special process, typically <a href="https://en.wikipedia.org/wiki/Init">init</a> (though it depends on the kernel's implementation), will adopt it as child and waits for it to complete and then reap it. This operation is called re-parenting and occurs automatically.</p>
+<blockquote>
+<p>SIDE NOTE:<br>On Unix-like operating systems, every process except process 0 (the <em>swapper</em>, or <em>idle task</em>), is created when another process executes the <code>fork()</code> system call. Every process (except process 0) has one parent process, but can have many child processes. Process 0 is a special process that is created when the system boots; its child process (process 1), known as <em>init</em>, is the ancestor of every other process.</p>
+</blockquote>
+<h2 id="23-reap-the-zombies-kob">2.3 Reap the zombies (KOB)</h2>
+<ul>
+<li>On Unix, if a process terminates, it becomes a <em>zombie</em>, which means it still consumes some system resources (e.g. a slot in the kernel's process table). Releasing the resources occupied by a zombie process is termed <em>reaping</em>.</li>
+<li>System call <code>waitpid()</code> can reap zombies. If zombie child is not reaped, it will <strong>continue to occupy system resources</strong> until the parent process itself terminates, at which point the kernel arranges for <a href="https://en.wikipedia.org/wiki/Init">init</a> process to reap the zombies. Long-running processes should always reap their own zombie children.
+<blockquote>
+<p>Another similar system call, <code>wait()</code>, has the same effect.</p>
+</blockquote>
+</li>
+<li>&quot;Block and wait&quot;: <code>waitpid()</code> and <code>wait()</code> block the calling process while waiting on the child process(es).</li>
+<li>In the examples below, <code>exit()</code> is a system call that terminates a process, and uses its argument as the exit status returned to the parent process, and sends a <code>SIGCHLD</code> signal to the parent process.</li>
+</ul>
+<h3 id="231-reap-as-they-exit">2.3.1 Reap as they exit</h3>
+<p>A child process is reaped as soon as it terminates.</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;     // for fork</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;      // for printf</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/wait.h&gt;   // for waitpid</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;errno.h&gt;      // for errno, ECHILD</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"exit-utils.h"</span></span>
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kNumChildren = <span class="hljs-number">8</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kForkFail = <span class="hljs-number">1</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> kWaitFail = <span class="hljs-number">2</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; kNumChildren; i++) {
+    <span class="hljs-keyword">pid_t</span> pid = fork();
+    exitIf(pid == <span class="hljs-number">-1</span>, kForkFail, <span class="hljs-built_in">stderr</span>, <span class="hljs-string">"Fork function failed.\n"</span>);
+    <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) <span class="hljs-built_in">exit</span>(<span class="hljs-number">110</span> + i); <span class="hljs-comment">/* a contrived return value */</span>
+  }
+
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) { <span class="hljs-comment">/* keeps reaping until there's no zombies left */</span>
+    <span class="hljs-keyword">int</span> status;
+    <span class="hljs-keyword">pid_t</span> pid = waitpid(<span class="hljs-number">-1</span>, &amp;status, <span class="hljs-number">0</span>); <span class="hljs-comment">/* waits for any child process */</span>
+
+    <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">-1</span>) <span class="hljs-keyword">break</span>; <span class="hljs-comment">/* if faild or no child left, then break */</span>
+    <span class="hljs-keyword">if</span> (WIFEXITED(status)) {
+      <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Child %d exited: status %d\n"</span>, pid, WEXITSTATUS(status));
+    }
+    <span class="hljs-keyword">else</span> {
+      <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Child %d exited abnormally.\n"</span>, pid);
+    }
+  }
+  exitUnless(errno == ECHILD, kWaitFail, <span class="hljs-built_in">stderr</span>, <span class="hljs-string">"waitpid failed.\n"</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<h3 id="232-reap-in-fork-order">2.3.2 Reap in fork order</h3>
+<p>Child processes are reaped in the same order as they are created.</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;     // for fork</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;      // for printf</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/wait.h&gt;   // for waitpid</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;errno.h&gt;      // for errno, ECHILD</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"exit-utils.h"</span> </span>
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> N = <span class="hljs-number">8</span>;
+exitIf(pid == <span class="hljs-number">-1</span>, kForkFail, <span class="hljs-built_in">stderr</span>, <span class="hljs-string">"Fork function failed.\n"</span>);
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  <span class="hljs-keyword">pid_t</span> children[N];
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; N; i++) {
+    children[i] = fork();
+    <span class="hljs-keyword">if</span> (children[i] == <span class="hljs-number">0</span>) <span class="hljs-built_in">exit</span>(<span class="hljs-number">110</span> + i); <span class="hljs-comment">/* a contrived return value */</span>
+  }
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; N; i++) { <span class="hljs-comment">/* wait for each child in order */</span>
+    <span class="hljs-keyword">int</span> status;
+    <span class="hljs-keyword">pid_t</span> pid = waitpid(children[i], &amp;status, <span class="hljs-number">0</span>); <span class="hljs-comment">/* waits in order */</span>
+
+    <span class="hljs-keyword">if</span> (WIFEXITED(status)) {
+      <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Child %d exited: status %d\n"</span>, pid, WEXITSTATUS(status));
+    }
+    <span class="hljs-keyword">else</span> {
+      <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Child %d exited abnormally.\n"</span>, pid);
+    }
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<h3 id="233-wait-a-minute-how-many-children-were-ever-created-in-these-two-examples">2.3.3 Wait a minute.. how many children were ever created in these two examples?</h3>
+<p>The short answer: in each example, there are 8 child processes. Each example will reap 8 processes and will print 8 lines of text in the terminal.</p>
+<blockquote>
+<p>There are 9 processes in total for each example, if you count the original parent in.</p>
+</blockquote>
+<p>Q: Ehh.. you said it would be a binary tree! Why weren't there 2<sup>8</sup>-1 = 255 child processes ever created?</p>
+<p>A: Note the code block in these examples:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; kNumChildren; i++) {
+    <span class="hljs-keyword">pid_t</span> pid = fork();
+    exitIf(pid == <span class="hljs-number">-1</span>, kForkFail, <span class="hljs-built_in">stderr</span>, <span class="hljs-string">"Fork function failed.\n"</span>);
+    <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) <span class="hljs-built_in">exit</span>(<span class="hljs-number">110</span> + i); <span class="hljs-comment">/* a contrived return value */</span>
+}
+</div></code></pre>
+<p>and</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; N; i++) {
+    children[i] = fork();
+    <span class="hljs-keyword">if</span> (children[i] == <span class="hljs-number">0</span>) <span class="hljs-built_in">exit</span>(<span class="hljs-number">110</span> + i); <span class="hljs-comment">/* a contrived return value */</span>
+}
+</div></code></pre>
+<p>Once a child process is created, it is <strong>terminated immediately thereafter</strong>, leaving no chance for the child to fork itself. Recall from 2.1.1 that <code>fork()</code> produces such a good replica of the original that all information, including the place to which the loop has progressed, are the same. The child process do <strong>not</strong> start from the beginning of the program.</p>
+<p>Here is an illustration, with 2 children created. Note that the order of exiting and reaping might not be as same as illustrated.</p>
+<pre class="hljs"><code><div>               exit()      (zombie)        reaped
+            ┌─────●─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ○        
+     child1 │     : return                           
+            │     :           exit()      (zombie)     reaped       
+            │     :          ┌─────●─ ─ ─ ─ ─ ─ ─ ─ ─ ── ○     
+            │     :   child2 │     : return                      
+parent      │     ▽          │     ▽                       
+────────────┴────────────────┴─────────────────────────────▶
+         fork()           fork()
+</div></code></pre>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

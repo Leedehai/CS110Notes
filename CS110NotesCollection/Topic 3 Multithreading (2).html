@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Multithrd (2)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h1 id="topic-3-multithreading-2">Topic 3 Multithreading (2)</h1>
+<div id="author-signature">Leedehai</div>
+Monday, May 1, 2017<br>Firday, May 5, 2017
+<h2 id="33-c-form-of-multithreading-thread">3.3 C++ form of multithreading: <code>&lt;thread&gt;</code></h2>
+<ul>
+<li>The C++ thread interfaces are type-safe and cleaner.</li>
+</ul>
+<h3 id="331-the-old-school-c-form">3.3.1 The old-school C form:</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* C */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;pthread.h&gt;</span></span>
+
+<span class="hljs-comment">/* thread routine */</span>
+<span class="hljs-comment">/* Note the return and arg types are all "void *" */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> *<span class="hljs-title">recharge</span><span class="hljs-params">(<span class="hljs-keyword">void</span> *unused)</span> </span>{
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"I recharge by spending time alone.\n"</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">pthread_t</span> introverts[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">6</span>; i++) {
+        pthread_create(&amp;introverts[i], <span class="hljs-literal">NULL</span>, recharge, <span class="hljs-literal">NULL</span>);
+    }
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">6</span>; i++) {
+        pthread_join(introverts[i], <span class="hljs-literal">NULL</span>);
+    }
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<h3 id="332-the-c-form">3.3.2 The C++ form:</h3>
+<blockquote>
+<p><code>using namespace std;</code> is omitted in C++ code afterwards.</p>
+</blockquote>
+<pre class="hljs"><code><div><span class="hljs-comment">/* C++11 */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;thread&gt;</span></span>
+<span class="hljs-comment">/* CS110 iomanipulators (oslock, osunlock) used to lock down streams */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"ostreamlock.h"</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-comment">/* Note the return type is "void" */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">recharge</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-built_in">cout</span> &lt;&lt; oslock 
+         &lt;&lt; <span class="hljs-string">"I recharge by spending time alone."</span> &lt;&lt; <span class="hljs-built_in">endl</span>
+         &lt;&lt; osunlock;
+    <span class="hljs-keyword">return</span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-comment">/* declare 6 thread objects (handles) */</span>
+    thread introverts[<span class="hljs-number">6</span>];
+    
+    <span class="hljs-comment">/* install thread routine to these threads */</span>
+    <span class="hljs-keyword">for</span> (thread &amp;t : introverts) {
+        t = thread(recharge);
+    }
+    <span class="hljs-comment">/* join: block, wait, reap zombie threads */</span>
+    <span class="hljs-comment">/* note you need the "&amp;" below, since thread class's
+     * assignment operator is deleted */</span>
+    <span class="hljs-keyword">for</span> (thread &amp;t : introverts) {
+        t.join();
+    }
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>C++ prototypes explained:</p>
+<ul>
+<li><code>oslock</code> and <code>osunlock</code> are implemented by CS110 course and meant to exclusively lock/unlock the output file stream, since <code>cout</code> is not thread-safe (unlike <code>printf()</code>). Without them, <code>ostream::operator&lt;&lt;()</code>'s output by multiple threads may get garbled.</li>
+<li>In C++, the thread routine can <strong>take in any number of arguments</strong> of any type.</li>
+<li>In C++, the thread routine <strong>returns nothing</strong>. If it does return something, the return value will be ignored.</li>
+<li><code>thread</code> is a C++11-provided class, defined in the <code>std</code> namespace.
+<ul>
+<li>These methods are used in the code above:<pre class="hljs"><code><div><span class="hljs-comment">/* default constructor */</span>
+thread();
+<span class="hljs-comment">/* initialization (the exact prototype is not our focus):
+   takes in a function pointer, followed by arguments (if any)
+   the thread routine's return is ignored */</span>
+thread (pRoutine, args...);
+
+<span class="hljs-comment">/* assign operator */</span>
+thread&amp; <span class="hljs-keyword">operator</span>= (thread&amp;&amp; rhs); <span class="hljs-comment">// rvalue reference</span>
+<span class="hljs-comment">/* join */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">join</span><span class="hljs-params">()</span></span>;
+</div></code></pre>
+</li>
+<li>Some other methods that may be frequently used:<pre class="hljs"><code><div><span class="hljs-comment">/* check is joinable */</span>
+<span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">joinable</span><span class="hljs-params">()</span></span>;
+<span class="hljs-comment">/* detach */</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">detach</span><span class="hljs-params">()</span></span>;
+<span class="hljs-comment">/* get thread ID */</span>
+thread::<span class="hljs-function">id <span class="hljs-title">get_id</span><span class="hljs-params">()</span></span>;
+</div></code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>SIDE NOTE:<br>The method <code>thread &amp;operator=(thread &amp;&amp;t)</code> takes in an rvalue reference. A effect of this design is that, after the <code>thread</code> object <code>t</code> on right hand side is assigned to the left hand side, <strong>the original</strong> <code>t</code> <strong>is gutted</strong>: as if it were a zero-argument constructed, empty, <strong>detached</strong> thread object.<br>Such mechanism is suitable if the right hand size object takes considerable effort to construct or clone.<br>It is unlike normal <code>a = b</code> assignment, after which <code>b</code> is intact and <code>a</code> is a copy of <code>b</code>.</p>
+</blockquote>
+<h3 id="333-another-c-example-using-variadic-arguments">3.3.3 Another C++ example: using variadic arguments</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* C++11 */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+
+<span class="hljs-comment">/* Note the return type is "void" and we pass in an arg to it*/</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">greet</span><span class="hljs-params">(<span class="hljs-keyword">size_t</span> id)</span> </span>{
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; id; i++) {
+    <span class="hljs-built_in">cout</span> &lt;&lt; oslock &lt;&lt; <span class="hljs-string">"Greeter #"</span> &lt;&lt; id &lt;&lt; <span class="hljs-string">" says 'Hello!'"</span> &lt;&lt; <span class="hljs-built_in">endl</span> &lt;&lt; osunlock;
+  }    
+  <span class="hljs-built_in">cout</span> &lt;&lt; oslock 
+       &lt;&lt; <span class="hljs-string">"Greeter #"</span> &lt;&lt; id &lt;&lt; <span class="hljs-string">" has issued all of his hellos, "</span>
+       &lt;&lt; <span class="hljs-string">"so he goes home!"</span> &lt;&lt; <span class="hljs-built_in">endl</span> 
+       &lt;&lt; osunlock;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  thread greeters[<span class="hljs-number">6</span>];
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">6</span>; i++) {
+      <span class="hljs-comment">/* Note that the variadic arg is passed in (one arg here):
+         thread (pRoutine, args...); */</span>
+      greeters[i] = thread(greet, i + <span class="hljs-number">1</span>);
+      <span class="hljs-comment">/* Pay attention to avoid the race condition
+         as discussed in 3.2.1 */</span>
+  }
+  <span class="hljs-keyword">for</span> (thread&amp; greeter: greeters) {
+      greeter.join();
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<h2 id="34-race-condition-critical-region-mutex-kob">3.4 Race condition: critical region, <code>mutex</code> (KOB)</h2>
+<ul>
+<li>Consider there are two ticket agents at the <a href="https://en.wikipedia.org/wiki/United_Express_Flight_3411_incident">United Airlines</a>. Their job is to sell 3 tickets in total, and the law prohibits overselling.</li>
+</ul>
+<h3 id="341-buggy-ticket-selling">3.4.1 Buggy ticket selling:</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Buggy */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;thread&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"ostreamlock.h"</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> numTickets = <span class="hljs-number">3</span>; <span class="hljs-comment">/* threads cannot share automatic variables */</span>
+
+ <span class="hljs-number">7</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">ticketAgent</span><span class="hljs-params">(<span class="hljs-keyword">size_t</span> id)</span> </span>{
+ <span class="hljs-number">8</span>     <span class="hljs-keyword">while</span> (numTickets &gt; <span class="hljs-number">0</span>) {
+ <span class="hljs-number">9</span>         numTickets--;
+<span class="hljs-number">10</span>         <span class="hljs-built_in">cout</span> &lt;&lt; oslock 
+<span class="hljs-number">11</span>              &lt;&lt; <span class="hljs-string">"Ticket agent "</span> &lt;&lt; id &lt;&lt; <span class="hljs-string">" sold one ticket,"</span>
+<span class="hljs-number">12</span>              &lt;&lt; <span class="hljs-string">" there are "</span> &lt;&lt; numTickets 
+<span class="hljs-number">13</span>              &lt;&lt; <span class="hljs-string">" more to sell!"</span> &lt;&lt; <span class="hljs-built_in">endl</span>
+<span class="hljs-number">14</span>              &lt;&lt; osunlock;
+<span class="hljs-number">15</span>     }
+<span class="hljs-number">16</span>}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    thread agents[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">2</span>; i++) {
+        agents[i] = thread(ticketAgent, <span class="hljs-number">101</span> + i); <span class="hljs-comment">/* agent 101, 102 */</span>
+    }
+    <span class="hljs-keyword">for</span> (thread &amp;a : agents) { <span class="hljs-comment">/* block and wait for each thread */</span>
+        a.join();
+    }
+    <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"End of business day!"</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>There are two problems caused by the <strong>unpredictability of the scheduler</strong>.</p>
+<blockquote>
+<p>Pause and think: which two?</p>
+</blockquote>
+<ul>
+<li>The first problem.
+<ul>
+<li>Say, (1) agent 101 proceeds to line 8 and discovered that <code>numTickets</code> is <code>1</code>, and is thus indeed greater than <code>0</code>, so it decides to sell one more ticket. (2) immediately after line 8, agent 101's thread is switched out from CPU, and agent 102 comes in. (3) agent 102 comes along and proceeds to line 8, it discovers <code>numTickets</code> is <code>1</code> and is greater than <code>0</code>, so it proceeds to sell the ticket and decrement <code>numTickets</code> to <code>0</code>. (3) agent 101 is switched back and it proceeds from where it left - it sells one ticket, decrementing <code>numTickets</code>.</li>
+<li>In the scenario above, the final <code>numTickets</code> is <code>-1</code>, and one ticket is oversold.</li>
+<li>The root of this problem is that, the code lacks a mechanism to guarantee line 9 is executed immediately after line 8.</li>
+</ul>
+</li>
+<li>The second problem.
+<ul>
+<li>Let's assume the first problem is fixed: line 9 is executed immediately after line 8.</li>
+<li>Note that line 9: <code>numTickets--;</code> might be translated into at least 3 assembly instructions, not 1 (assume <code>numTickets</code> is stored on address <code>0x1122</code>) - dependent on the instruction set:<pre class="hljs"><code><div>MOVQ 0x1122, %rax   ;move value from 0x1122 to RAX  (line A)
+SUB %rax, $1        ;subtract the value in RAX by 1 (line B)
+MOVQ %rax, 0x1122   ;move value from RAX to 0x1122  (line C)
+</div></code></pre>
+</li>
+<li>Say (1) agent 101 is switched out from CPU immediately after it completes line A, and the RAX value is stored. (2) agent 102 comes along, sells a ticket, and decrements <code>numTickets</code> to <code>0</code>. (3) agent 101 is switched back, stored register values loaded back to CPU, and proceeds from where it left: it executes line B and C.</li>
+<li>Thus, the final <code>numTickets</code> is <code>-1</code>, and one ticket is oversold. <strong>A C++ statement is not atomic; an assembly instruction is</strong>.</li>
+</ul>
+<pre class="hljs"><code><div>&lt;thrd.1&gt; :                      : &lt;thrd.1&gt;
+───●───●─:─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─●──●─..─●─▶
+   {   A :                      :B  C    }  
+         ▽                      △             ──▶ time
+         ▽                      △             A: MOVQ 0x1122, %rax
+         :  {    A  B  C      } :             B: SUB %rax, $1
+─ ─ ─ ─ ─:──●────●──●──●─..───●─:─ ─ ─ ─ ──▶  C: MOVQ %rax, 0x1122
+         :      &lt;thrd.2&gt;        :
+</div></code></pre>
+</li>
+</ul>
+<blockquote>
+<p>A <em>race condition</em> happens when the processes or threads depend on some <strong>shared state</strong> (<code>numTickets</code>'s value here). <br>Operations upon shared states are critical code sections (<em>critical region</em>s) that must be mutually exclusive. That is, when one steps into the critical region, the others should be prevented to do the same until the first one steps out.</p>
+</blockquote>
+<h3 id="342-solution-mutex-and-locking">3.4.2 Solution: <code>mutex</code> and locking</h3>
+<ul>
+<li>
+<p>In the example above, C++ code line 8 to 14 should be executed in tandem without the thread being switched halfway. That is, line 8 to 14 should be a transaction.</p>
+</li>
+<li>
+<p>&quot;mutex&quot;: mutual exlusion. This is a C++ class, and some of its methods are</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* constructor */</span>      mutex();
+<span class="hljs-comment">/* lock */</span>             <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">lock</span><span class="hljs-params">()</span></span>;
+<span class="hljs-comment">/* unlock */</span>           <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">unlock</span><span class="hljs-params">()</span></span>;
+<span class="hljs-comment">/* lock if unlocked */</span> <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">try_lock</span><span class="hljs-params">()</span></span>;
+</div></code></pre>
+<ul>
+<li>
+<p><code>lock()</code>: (1) if the object is unlocked, then lock it, and the following code is in a transaction; (2) if the object is locked by another thread, then <strong>block and wait</strong> until unlocked; (3) if the object is already locked by the same thread, it caused an undefined behavior.</p>
+<blockquote>
+<p>Whenever a process or thread is in a blocked state, it will be switched out from CPU, and register values are stored in memory.
+When more than one thread attempts to lock it, one of them succeeds.</p>
+</blockquote>
+</li>
+<li>
+<p><code>unlock()</code>: (1) if the object is locked by the same thread, then unlock it, and the following code is not in a transaction; (2) if the object is already unlocked, the behavior is undefined.</p>
+</li>
+<li>
+<p><code>try_lock()</code>: (1) if the object is unlocked, then lock it and return <code>true</code>; (2) if the object is locked by another thread, then give up and immediately return <code>false</code>; (3) if the object is already locked by the same thread, it caused an undefined behavior.</p>
+</li>
+</ul>
+<blockquote>
+<p>Like in a hostel, people go to the bathroom to take shower. The shower-taker locks the door before start and unlocks it after the job is done. While the door is locked, other people just wait outside (or leave and come back later).</p>
+</blockquote>
+</li>
+</ul>
+<p>The fixed version:</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Problem fixed */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;thread&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"ostreamlock.h"</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;mutex&gt;        /* for mutex class */</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> numTickets = <span class="hljs-number">3</span>;
+<span class="hljs-keyword">static</span> mutex ticketLock;   <span class="hljs-comment">/* global, shared among threads */</span>
+
+ <span class="hljs-number">7</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">ticketAgent</span><span class="hljs-params">(<span class="hljs-keyword">size_t</span> id)</span> </span>{
+ <span class="hljs-number">8</span>*   <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+ <span class="hljs-number">8</span>+       ticketLock.lock(); <span class="hljs-comment">/* lock */</span>
+ <span class="hljs-number">9</span>        numTickets--;
+<span class="hljs-number">10</span>        <span class="hljs-built_in">cout</span> &lt;&lt; oslock 
+<span class="hljs-number">11</span>             &lt;&lt; <span class="hljs-string">"Ticket agent "</span> &lt;&lt; id &lt;&lt; <span class="hljs-string">" sold one ticket,"</span>
+<span class="hljs-number">12</span>             &lt;&lt; <span class="hljs-string">" there are "</span> &lt;&lt; numTickets 
+<span class="hljs-number">13</span>             &lt;&lt; <span class="hljs-string">" more to sell!"</span> &lt;&lt; <span class="hljs-built_in">endl</span>
+<span class="hljs-number">14</span>             &lt;&lt; osunlock;
+<span class="hljs-number">14</span>+       <span class="hljs-keyword">if</span> (numTickets == <span class="hljs-number">0</span>) <span class="hljs-keyword">break</span>;
+<span class="hljs-number">14</span>++      ticketLock.unlock(); <span class="hljs-comment">/* unlock */</span>
+<span class="hljs-number">15</span>    }
+<span class="hljs-number">16</span>}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    thread agents[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">2</span>; i++) {
+        agents[i] = thread(ticketAgent, <span class="hljs-number">101</span> + i); <span class="hljs-comment">/* agent 101, 102 */</span>
+    }
+    <span class="hljs-keyword">for</span> (thread &amp;a : agents) { <span class="hljs-comment">/* block and wait for each thread */</span>
+        a.join();
+    }
+    <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"End of business day!"</span> &lt;&lt; <span class="hljs-built_in">endl</span>;
+
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>Code explained:</p>
+<ul>
+<li>To fix problem 1: replace <code>while(numTickets &lt; 0)</code> with <code>while (true)</code> and place the condition checking inside the loop. And...</li>
+<li>To fix problem 1 and 2: use a <code>mutex</code> lock object to guard the loop body, which is the <em>critical region</em>: the sequence of instructions that <strong>at most one thread</strong> should be in at any time.</li>
+<li>Note that the <code>mutex</code> object should be global, so all threads can agree on this lock.
+<blockquote>
+<p>You certainly don't want someone else to come into the bathroom <strong>though another door</strong> while you are in it, right?</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="appendix-the-implementation-of-oslock-and-osunlock">Appendix: the implementation of <code>oslock</code> and <code>osunlock</code></h2>
+<pre class="hljs"><code><div><span class="hljs-comment">/* ostreamlock.h */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;ostream&gt;</span></span>
+
+<span class="hljs-built_in">std</span>::<span class="hljs-function">ostream&amp; <span class="hljs-title">oslock</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::ostream&amp; os)</span></span>;
+<span class="hljs-built_in">std</span>::<span class="hljs-function">ostream&amp; <span class="hljs-title">osunlock</span><span class="hljs-params">(<span class="hljs-built_in">std</span>::ostream&amp; os)</span></span>;
+</div></code></pre>
+<pre class="hljs"><code><div><span class="hljs-comment">/* ostreamlock.cc */</span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;ostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;mutex&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;memory&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;map&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"ostreamlock.h"</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-keyword">static</span> mutex mapLock;
+<span class="hljs-keyword">static</span> <span class="hljs-built_in">map</span>&lt;ostream *, <span class="hljs-built_in">unique_ptr</span>&lt;mutex&gt;&gt; streamLocks;
+
+<span class="hljs-function">ostream&amp; <span class="hljs-title">oslock</span><span class="hljs-params">(ostream&amp; os)</span> </span>{
+  ostream *ostreamToLock = &amp;os;
+  <span class="hljs-keyword">if</span> (ostreamToLock == &amp;<span class="hljs-built_in">cerr</span>) ostreamToLock = &amp;<span class="hljs-built_in">cout</span>;
+  mapLock.lock();
+  <span class="hljs-built_in">unique_ptr</span>&lt;mutex&gt;&amp; up = streamLocks[ostreamToLock];
+  <span class="hljs-keyword">if</span> (up == <span class="hljs-literal">nullptr</span>) {
+    up.reset(<span class="hljs-keyword">new</span> mutex);
+  }
+  mapLock.unlock();
+  up-&gt;lock();
+  <span class="hljs-keyword">return</span> os;
+}
+
+<span class="hljs-function">ostream&amp; <span class="hljs-title">osunlock</span><span class="hljs-params">(ostream&amp; os)</span> </span>{
+  ostream *ostreamToLock = &amp;os;
+  <span class="hljs-keyword">if</span> (ostreamToLock == &amp;<span class="hljs-built_in">cerr</span>) ostreamToLock = &amp;<span class="hljs-built_in">cout</span>;
+  mapLock.lock();
+  <span class="hljs-keyword">auto</span> found = streamLocks.find(ostreamToLock);
+  mapLock.unlock();
+  <span class="hljs-keyword">if</span> (found == streamLocks.end())
+    <span class="hljs-keyword">throw</span> <span class="hljs-string">"unlock inserted into stream that has never been locked."</span>;
+  <span class="hljs-built_in">unique_ptr</span>&lt;mutex&gt;&amp; up = found-&gt;second;
+  up-&gt;unlock();
+  <span class="hljs-keyword">return</span> os;
+}
+</div></code></pre>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>

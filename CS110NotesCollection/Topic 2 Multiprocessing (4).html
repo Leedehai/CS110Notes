@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>Multiproc (4)</title>
+		<link rel="icon" href="../CS110Notes_icon.png">
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 26px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+body
+{
+    background-color: white;
+}
+.emoji
+{
+    height: 20px;
+}
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* Modification based on the original version is made. */
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+	margin:0px auto;
+	width:670px;
+	background-color: #f5f5f5
+}
+
+#author-signature {
+	text-align: right;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+	color: #1e1e1e;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #2a232d;
+	/* color: #4080D0;*/
+	background-color: #ececec;
+	/* background-color: transparent; */
+}
+
+.vscode-dark code { /* all code, including code block and inline code */
+	font-family: "Courier New", monospace, Menlo, Monaco, Consolas, "Droid Sans Mono", "Droid Sans Fallback";
+	/* font-family: Menlo, Monaco, Consolas, "Courier New", monospace, "Droid Sans Mono", "Droid Sans Fallback"; */
+	font-weight: bold;
+	/* font-weight: normal */
+	color: #D7BA7D;
+	background-color: transparent;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: #f2f2f2;
+	/* background-color: rgba(220, 220, 220, 0.4); */
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div { /* code block */
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div { /* code block */
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: transparent;
+	border-color: rgba(70, 70, 70, 0.2);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+/* Base16 Atelier Forest Light - Theme */
+/* by Bram de Haan (http://atelierbram.github.io/syntax-highlighting/atelier-schemes/forest) */
+/* Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16) */
+/* https://github.com/jmblog/color-themes-for-highlightjs */
+/* Modification was made */
+
+/* Atelier Forest Light Comment */
+.hljs-comment,
+.hljs-title {
+ color: #766e6b;
+}
+
+/* Atelier Forest Light Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+ color: #f22c40;
+}
+
+/* Atelier Forest Light Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-built_in,
+.hljs-literal,
+.hljs-constant {
+ color: #1E1E1E;
+}
+
+/* Atelier Forest Light Yellow */
+.hljs-ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+ color: #d5911a;
+}
+
+.hljs-params {
+ color: #f57911; 
+}
+
+/* Atelier Forest Light Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+ color: #5ab738;
+}
+
+/* Atelier Forest Light Aqua */
+.css .hljs-hexcolor {
+ color: #00ad9c;
+}
+
+/* Atelier Forest Light Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+ color: #407ee7;
+}
+
+/* Atelier Forest Light Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+ color: #6666ea;
+}
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+ opacity: 0.5;
+}
+
+/***** by jasily *****/
+
+.hljs {
+ display: block;
+ overflow-x: auto;
+ background: #f1efee;
+ color: #68615e;
+ padding: 0.5em;
+ -webkit-text-size-adjust: none;
+}
+
+.hljs-keyword {
+ color: #9868b6;
+}
+
+.hljs-number {
+ color: #f57911;
+}
+
+.hljs-string {
+ color: #70aa11;
+}
+
+.hljs-comment {
+ color: #2399c6;
+}
+
+.hljs-xmlDocTag {
+ color: #23CEE8;
+}
+
+.hljs-class {
+ color: #1E1E1E;
+}
+
+.hljs-function {
+ color: #1E1E1E;
+}
+
+.hljs-title {
+ color: #4271ae;
+}
+
+.hljs-variable {
+ color: #F572F0;
+}
+</style>
+    </head>
+    <body>
+        <article class="markdown-body">
+            <h2 id="topic-2-multiprocessing-4">Topic 2 Multiprocessing (4)</h2>
+<div id="author-signature">Leedehai</div>
+Friday, April 21, 2017<br>Monday, April 24, 2017
+<h2 id="26-inter-process-communication-ii-signal-and-signal-handler">2.6 Inter-process communication II: signal and signal handler</h2>
+<h3 id="261-an-overview">2.6.1 An overview</h3>
+<ul>
+<li><em>Signal</em> is a more rudimentary messaging mechanism of inter-process communications. Moreover, it is how process communicates with the OS kernel itself. In C, a signal is represented by a macro-defined constant integer.</li>
+</ul>
+<blockquote>
+<p>For example: <br>Signal <code>SIGSEGV</code> (macro-defined constant <code>11</code>) indicates segmentation violation (e.g. writing to an invalid address); <code>SIGFPE</code> indicates floating-point exception (e.g. diving by integer <code>0</code>); <code>SIGILL</code> indicates an illegal instruction; <code>SIGINT</code> is forced interruption sent by your Ctrl+C in the shell; <code>SIGTSTP</code> and <code>SIGCONT</code> can temporarily stop and resume a process. There are also two signals left for the user: <code>SIGUSR1</code> and <code>SIGUSR2</code>. For a complete list, you can see <a href="http://man7.org/linux/man-pages/man7/signal.7.html">here</a>.</p>
+</blockquote>
+<ul>
+<li>
+<p>Upon receiving a signal, the recipient process can either ignore it, abort, or turn to the corresponding signal handler. If a custom signal handler is not registered for the process, the default handler will be invoked.</p>
+</li>
+<li>
+<p>After the signal function completes, the process <strong>resumes</strong>, unless the handler terminates the process for good by calling <code>exit()</code>.</p>
+</li>
+<li>
+<p>For most signals, the system call <code>signal()</code> allows you to register a custom signal handler function for it. <code>signal()</code>'s prototype is <code>sighandler_t signal(int sig, sighandler_t handler);</code>, where <code>sighandler_t</code> is of type <code>void(*)(int)</code>. To de-register the custom handler, use <code>SIG_DFL</code> (&quot;default&quot;) as the second argument. Example:</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdlib.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/wait.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">handleSIGSEGV</span><span class="hljs-params">(<span class="hljs-keyword">int</span> sig)</span> </span>{
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Oops, super sorry, a segfault occurs.\n"</span>);
+    <span class="hljs-built_in">exit</span>(<span class="hljs-number">0</span>); <span class="hljs-comment">/* Exit the process, otherwise it keeps running into
+                the segfault error each time the process resumes */</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    signal(SIGSEGV, handleSIGSEGV); <span class="hljs-comment">/* register a custom handler */</span>
+    *(<span class="hljs-keyword">int</span> *)<span class="hljs-literal">NULL</span> = <span class="hljs-number">1</span>; <span class="hljs-comment">/* cause a segmentation fault */</span>
+
+    <span class="hljs-comment">/* the process can never reach here */</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>If you would like to pass some client data to that signal handler, you can do so by populating a gloabal variable, which is visible to the handler function.</p>
+<p>However, there are some signals to which you cannot register custom signal handlers, such as <code>SIGCONT</code> and <code>SIGKILL</code>, which can kill a process by force.</p>
+</li>
+</ul>
+<blockquote>
+<p>Responding to a signal with signal handler is a form of <em>exception handling</em>. That is, the process suspends its normal routine and executes the exeception handling routine, and then goes back to resume its normal routine.</p>
+</blockquote>
+<pre class="hljs"><code><div>                     │             │
+     normal routine  │             ▼ instruction sequence
+                     │ suspend         
+          signal ~~&gt; ▼........▷┐
+                     ┌◁...     │
+                     │ resume  │ exception handling routine
+                     │   :     │
+                     │   :.....▼....▷ abort   
+                     ▼       
+</div></code></pre>
+<p>Today we will focus on a specific signal: <code>SIGCHLD</code> (constant <code>17</code>).</p>
+<h3 id="262-dealing-with-signals-sigchld-as-an-example">2.6.2 Dealing with signals: <code>SIGCHLD</code> as an example</h3>
+<ul>
+<li>A process can use system call <code>waitpid()</code> (or <code>wait()</code>) to wait for a child's termination and reap the zombie. The problem is, <strong>performing a wait blocks the parent process</strong>.</li>
+<li>Now, we want the parent process to deal with a child's termination (or suspension), without blocking the parent itself. Therefore, we turn to the signal <code>SIGCHLD</code> and its signal handler.</li>
+<li>A <code>SIGCHLD</code> is sent <strong>automatically</strong> by the kernel to a process, telling the process that one of its child process <strong>terminates</strong> or <strong>stops</strong>.</li>
+<li>The thinking is that: the parent process continues to run until a <code>SIGCHLD</code> signal arrives, at which point the parent invokes the signal hander, in which a wait is performed to get the PID and status of the terminated child process, and reap the zombie. Since by the time of wait a child has already terminated, the <code>waitpid()</code> can return immediately without blocking the parent process.</li>
+</ul>
+<pre class="hljs"><code><div>                                            completes   reaped
+            ┌─────────────(do stuff)───────────────●─ ─ ─○ 
+     child  │                                      :                 ──▶
+            │                              SIGCHLD :                 time
+parent      │                                      :  
+────────────┴──────────(do other stuff)────────────▽┐ handler ┌───▶
+          fork()                                    └─────────┘
+</div></code></pre>
+<h4 id="2621-an-example-of-handling-sigchld">2.6.2.1 An example of handling <code>SIGCHLD</code></h4>
+<p>Suppose a parent process creates 5 child processes. The parent goes on to do other stuff (here, sleeping) while waiting for children's termination and reap them, until all five children are reaped.</p>
+<p>Since the parent needs to do other stuff while waiting, we cannot use <code>waitpid()</code> as it will block the parent process. Here, we need to use <code>SIGCHLD</code>.</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/wait.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"other_stuff.h"</span> <span class="hljs-comment">// for do_stuff</span></span>
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> kNumChildren = <span class="hljs-number">5</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> numDone = <span class="hljs-number">0</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">reapChild</span><span class="hljs-params">(<span class="hljs-keyword">int</span> sig)</span> </span>{ <span class="hljs-comment">/* the handler. sig is unused. */</span>
+  waitpid(<span class="hljs-number">-1</span>, <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>); <span class="hljs-comment">/* wait for any one child and reap it */</span>
+  numDone++;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    signal(SIGCHLD, reapChild); <span class="hljs-comment">/* register the handler */</span>
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> kid = <span class="hljs-number">1</span>; kid &lt;= kNumChildren; kid++) {
+        <span class="hljs-keyword">pid_t</span> pid = fork(); <span class="hljs-comment">/* create a child process */</span>
+
+        <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) { <span class="hljs-comment">/* for the child process */</span>
+          sleep(<span class="hljs-number">3</span> * kid); <span class="hljs-comment">/* sleep for some seconds proportinal to kid */</span>
+          <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Kid %d completes.\n"</span>, kid);
+          <span class="hljs-built_in">exit</span>(<span class="hljs-number">0</span>); <span class="hljs-comment">/* do not forget to exit! */</span>
+        }
+
+        <span class="hljs-comment">/* for the parent process */</span>
+        <span class="hljs-keyword">while</span> (numDone &lt; kNumChildren) {
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Parent wakes up.\n"</span>);
+            sleep(<span class="hljs-number">5</span>);
+        }
+
+        <span class="hljs-built_in">printf</span>(<span class="hljs-string">"All finished. Go home.\n"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    }
+}
+</div></code></pre>
+<h3 id="263-pending-signal">2.6.3 Pending signal</h3>
+<p>A signal that has been sent but not yet received is called a <em>pending signal</em>. At
+any point in time, there can be <strong>at most one pending signal of a particular type</strong>. If a process has a pending signal of type K, then any subsequent signals of the same type K sent to that process are not queued; they are simply discarded.</p>
+<p>If all of the aforementioned 5 child processes (in 2.6.2.1) completes at the same time, the kernel will send 5 <code>SIGCHLD</code> signals at once to the parent process, but the signal handler will get executed only once - because the parent process only knows if there is a <code>SIGCHLD</code> signal waiting to be handled, but it <strong>has no clue how many such signals have yet to be dealt with</strong>.</p>
+<blockquote>
+<p>For each process, the kernel maintains the set of pending signals in a <strong>&quot;pending bit&quot; vector</strong> in the kernel memory space. The kernel sets bit K in pending whenever a signal of type K is delivered to that process and clears bit K when this signal is received by that process.</p>
+</blockquote>
+<p>In this hypothetical case, the parent process never completes, as the counter <code>numDone</code> never reaches 5. Also, only one children is reaped, because the handler is executed only once.</p>
+<p>We have to modify the code like this:</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;unistd.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;sys/wait.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"other_stuff.h"</span> <span class="hljs-comment">// for do_stuff</span></span>
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> kNumChildren = <span class="hljs-number">5</span>;
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> numDone = <span class="hljs-number">0</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">reapChild</span><span class="hljs-params">(<span class="hljs-keyword">int</span> sig)</span> </span>{ <span class="hljs-comment">/* the handler. sig is unused. */</span>
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) { <span class="hljs-comment">/* keeps reaping till there is no zombie at the moment */</span>
+      <span class="hljs-comment">/* the 3rd arg should be WNOHANG, otherwise waitpid()
+       * blocks the process while waiting if there is
+       * at least one child who didn't complete */</span>
+      <span class="hljs-keyword">pid_t</span> pid = waitpid(<span class="hljs-number">-1</span>, <span class="hljs-literal">NULL</span>, WNOHANG);
+
+      <span class="hljs-comment">/* With WNOHANG, if there is &gt;= 1 child running
+       * and 0 unreaped zombie child, waitpid() returns 0.
+       * If there is no child, waitpid() returns -1 */</span>
+      <span class="hljs-keyword">if</span> (pid &lt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">break</span>;
+      numDone++;
+  }
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    signal(SIGCHLD, reapChild); <span class="hljs-comment">/* register the handler */</span>
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> kid = <span class="hljs-number">1</span>; kid &lt;= kNumChildren; kid++) {
+        <span class="hljs-keyword">pid_t</span> pid = fork(); <span class="hljs-comment">/* create a child process */</span>
+
+        <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) { <span class="hljs-comment">/* for the child process */</span>
+          
+          sleep(<span class="hljs-number">3</span>); <span class="hljs-comment">/* sleep for the same amount of time */</span>
+          <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Kid %d completes.\n"</span>, kid);
+          <span class="hljs-built_in">exit</span>(<span class="hljs-number">0</span>); <span class="hljs-comment">/* do not forget to exit! */</span>
+        }
+
+        <span class="hljs-comment">/* for the parent process */</span>
+        <span class="hljs-keyword">while</span> (numDone &lt; kNumChildren) {
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Parent wakes up.\n"</span>);
+            sleep(<span class="hljs-number">5</span>);
+        }
+
+        <span class="hljs-built_in">printf</span>(<span class="hljs-string">"All finished. Go home.\n"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    }
+}
+</div></code></pre>
+<p>Note that in this modified version we pass <code>WNOHANG</code> as the 3rd argument to <code>waitpid()</code>.</p>
+<p>The reason is this: <strong>if there is still at least one child left running</strong>, <code>waitpid(-1, NULL, 0)</code> will block the parent process. Replacing the 3rd argument <code>0</code> with <code>WNOHANG</code> prevents the parent process from being hanged up in this case, and <code>waitpid()</code> will immediately return <code>0</code>.</p>
+<p>Of course, if all children have been completed and reaped, <code>waitpid()</code> returns <code>-1</code> as before, as there is no running child to wait.</p>
+<p>Another caveat is that the kernel is responsible for scheduling the parent and child processes. Therefore, the 5 children might not be finished at the same time, even though I told them to sleep for the same amount of time.</p>
+<blockquote>
+<p>Each process has a clock to record the time duration of its actual running. When the process is suspended, the clock stops counting.</p>
+</blockquote>
+<h3 id="264-blocked-signal">2.6.4 Blocked signal</h3>
+<ul>
+<li>A process can selectively <em>block</em> the receipt of certain signals. When a signal type is blocked, the signal of this type won't be received by the process until it is unblocked.</li>
+<li>For each process, the kernel also maintains the set of blocked signals in a <strong>&quot;blocked bit&quot; vector</strong>, in the kernel memory space. If a signal is delivered to a process, but that kind of signal is blocked by this process, the process won't receive the signal. In this case, the corresponding bit in the pending signal vector is not cleared until the signal is unblocked and received.</li>
+<li>Blocking certain signals <strong>forces an execution order</strong> of the parent and the child process. Without blocking, the order of process execution is not guaranteed.</li>
+</ul>
+<h4 id="2641-blockingunblocking-a-signal-sigprocmask">2.6.4.1 Blocking/unblocking a signal: <code>sigprocmask()</code></h4>
+<ul>
+<li>
+<p>System call <code>sigprocmask()</code> can examine and modify the set of blocked signals.</p>
+</li>
+<li>
+<p>Its prototype is</p>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">sigprocmask</span><span class="hljs-params">(<span class="hljs-keyword">int</span> how, <span class="hljs-keyword">const</span> <span class="hljs-keyword">sigset_t</span> *<span class="hljs-built_in">set</span>, <span class="hljs-keyword">sigset_t</span> *oldset)</span></span>;
+</div></code></pre>
+<p>The first argument can be:</p>
+<ul>
+<li><code>SIG_BLOCK</code>: <strong>adds</strong> the signal types specified by the second argument <code>set</code> to the list of already-blocked signal types.</li>
+<li><code>SIG_UNBLOCK</code>: <strong>removes</strong> the signal types specified by the second argument <code>set</code> to the list of already-blocked signal types.</li>
+<li><code>SIG_SETMASK</code>: <strong>set</strong> to list of blocked signal types to the the ones specified by the second argument.</li>
+</ul>
+<p>The second argument is a pointer of type <code>sigset_t *</code>, which points to a bit vector of type <code>sigset</code> (it can be viewed as an integer), each bit representing a certain signal type.</p>
+<p>The third argument is also a pointer of type <code>sigset_t *</code>. The system call <code>sigprocmask()</code> populates the bit vector referenced by this pointer with the <strong>original block list</strong> before alteration. If not interested, it can be <code>NULL</code>.</p>
+</li>
+<li>
+<p>More about the bit vector <code>sigset_t</code>: this is defined in the POSIX extension of C. Typical usages is:</p>
+<ul>
+<li>Create a <code>sigset_t</code> bit vector: <code>sigset_t mask;</code> (bit values are uninitialized)</li>
+<li>Clear this bit vector: <code>sigemptyset(&amp;mask);</code></li>
+<li>Add a <code>SIGCHLD</code> (or another signal type) to this vector: <code>sigaddset(&amp;mask, SIGCHLD);</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="2642-an-example-blocking-sigchld">2.6.4.2 An example: blocking <code>SIGCHLD</code></h4>
+<p>We want a program that executes the <code>date</code> command consecutively for 3 times.</p>
+<p>Without blocking, the code looks like this (buggy - synchronization problem):</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">reapChild</span><span class="hljs-params">(<span class="hljs-keyword">int</span> sig)</span> </span>{ <span class="hljs-comment">/* the SIGCHLD handler */</span>
+  <span class="hljs-keyword">pid_t</span> pid;
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) { <span class="hljs-comment">/* keeps reaping zombies until there is no zombie */</span>
+    pid = waitpid(<span class="hljs-number">-1</span>, <span class="hljs-literal">NULL</span>, WNOHANG);
+    <span class="hljs-keyword">if</span> (pid &lt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">break</span>;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Job #(%d) completes and removed\n"</span>, pid);
+  }
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  exitIf(signal(SIGCHLD, reapChild) == SIG_ERR, kSignalFailed,
+         <span class="hljs-built_in">stderr</span>, <span class="hljs-string">"signal function failed.\n"</span>);
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">3</span>; i++) {
+    <span class="hljs-keyword">pid_t</span> pid = fork();
+    exitIf(pid == <span class="hljs-number">-1</span>, kForkFailed,
+           <span class="hljs-built_in">stderr</span>, <span class="hljs-string">"fork function failed.\n"</span>);
+    <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">char</span> *listArguments[] = {<span class="hljs-string">"date"</span>, <span class="hljs-literal">NULL</span>};
+      exitIf(execvp(listArguments[<span class="hljs-number">0</span>], listArguments) == <span class="hljs-number">-1</span>,
+             kExecFailed, <span class="hljs-built_in">stderr</span>, <span class="hljs-string">"execvp function failed.\n"</span>);
+    }
+    snooze(<span class="hljs-number">1</span>); <span class="hljs-comment">/* represents meaningful time spent */</span>
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Job #(%d) added\n"</span>, pid);
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>The problem is, the command <code>date</code> executes very fast, so the child process usually completes before the parent finishes its <code>sleep()</code>, causing the parent process having to turn to the signal handler and print <code>&quot;Job #(pid) completes and removed&quot;</code> <strong>before</strong> printing <code>&quot;Job #(pid) added&quot;</code> - not good.</p>
+<pre class="hljs"><code><div>                     completes   reaped
+               ┌──(&quot;date&quot;)──●─ ─ ─○ 
+     child     │            :         
+               │            : SIGCHLD
+parent         │    0.8s    :           0.2s
+───────────────┴────────────▽┐         ┌────●─────────────▶
+            fork()           │ handler │  &quot;job added&quot;
+                             └───────●─┘
+                                &quot;job removed&quot;
+</div></code></pre>
+<p>To fix the synchronization problem, we need to block the <code>SIGCHLD</code> signals to <strong>enforce an execution order</strong>. That is, the parent blocks <code>SIGCHLD</code> signals until it finishes its sleeping task.</p>
+<p>The corrected version is this:</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">reap</span><span class="hljs-params">(<span class="hljs-keyword">int</span> sig)</span> </span>{...} <span class="hljs-comment">/* the SIGCHLD handler */</span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  signal(SIGCHLD, reapChild);
+
+  <span class="hljs-keyword">sigset_t</span> mask;
+  sigemptyset(&amp;mask);
+  sigaddset(&amp;mask, SIGCHLD);
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">size_t</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">3</span>; i++) {
+    <span class="hljs-comment">/* the parent blocks SIGCHLD signals */</span>
+    sigprocmask(SIG_BLOCK, &amp;mask, <span class="hljs-literal">NULL</span>);
+    <span class="hljs-keyword">pid_t</span> pid = fork();
+
+    <span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) { <span class="hljs-comment">/* for the child process */</span>
+      <span class="hljs-comment">/* The child duplicates the parent's block list,
+       * so the child needs to unblock SIGCHLD, in case
+       * "date" might rely on this signal */</span>
+      sigprocmask(SIG_UNBLOCK, &amp;mask, <span class="hljs-literal">NULL</span>);
+
+      <span class="hljs-keyword">char</span> *listArguments[] = {<span class="hljs-string">"date"</span>, <span class="hljs-literal">NULL</span>};
+      execvp(listArguments[<span class="hljs-number">0</span>], listArguments);
+    }
+    <span class="hljs-comment">/* for the parent process */</span>
+    sleep(<span class="hljs-number">1</span>);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"Job %d added to job list.\n"</span>, pid);
+    
+    <span class="hljs-comment">/* the parent unblock SIGCHLD signals,
+     * being able to receive SIGCHLD again */</span>
+    sigprocmask(SIG_UNBLOCK, &amp;mask, <span class="hljs-literal">NULL</span>);
+  } 
+
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>Note that <code>execvp()</code> does not change a process's blocked signal list, as the list is maintained by the kernel, not residing in the process's memory space.</p>
+<pre class="hljs"><code><div>                         completes                        reaped
+               ┌──(&quot;date&quot;)──●─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ○ 
+     child     │            : SIGCHLD      
+               │            :. .. .. .. .. .. .. .. ...       
+parent       ▬▬│▬▬▬▬▬b▬▬l▬▬o▬▬c▬▬k▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬:  
+────────────◉──┴─────────────────────────────●───────◉▽┐         ┌───▶
+        block  fork()        1.0s   &quot;job added&quot; unblock│ handler │
+      SIGCHLD                                   SIGCHLD└───────●─┘
+                                                          &quot;job removed&quot;
+</div></code></pre>
+<blockquote>
+<p>SIDE NOTE:<br>A <em>job</em> refers to a family of processes that is (directly or indirectly) initiated by a command in shell. You can print all current running jobs and their job ID using command <code>jobs</code>. It is a concept which is only meaningful for the shell, not for the OS kernel.</p>
+</blockquote>
+<h3 id="265-send-a-signal-kill">2.6.5 Send a signal: <code>kill()</code></h3>
+<ul>
+<li>The system call <code>kill()</code> can be used to send any signal to any process.</li>
+<li>Its prototype is <code>int kill(pid_t pid, int sig);</code>.</li>
+<li>The signal <code>sig</code> is sent to the process identified by <code>pid</code>. If <code>pid</code> is less than <code>-1</code>, then <code>sig</code> is sent to every process belonging to the process group whose pgid is the absolute value of <code>pid</code>.</li>
+<li>This system call is a <strong>misnomer</strong> - it can deliver signals more than <code>SIGKILL</code>.</li>
+<li>In shell, there is a command also named <code>kill</code>, which can send a signal (<code>SIGKILL</code> by default) to the process whose PID is provided as the command's argument. If you would like to send the process 1009 with a signal other than <code>SIGKILL</code>, say, <code>SIGSEGV</code> (whose value is <code>11</code>), you could use the command like this: <code>$ kill -11 1009</code>, in which case, process 1009 would be delivered a signal claiming there is a segmentation fault.</li>
+</ul>
+<h4 id="2651-the-kill-puzzle">2.6.5.1 The kill puzzle</h4>
+<p>Consider the following program. What is the output?</p>
+<pre class="hljs"><code><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> ...</span>
+
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">pid_t</span> pid;
+<span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> counter = <span class="hljs-number">0</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">parentHandler</span><span class="hljs-params">(<span class="hljs-keyword">int</span> unused)</span> </span>{
+  counter++;
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"counter = %d\n"</span>, counter);
+
+  kill(pid, SIGUSR1); <span class="hljs-comment">/* the parent sends the child a signal */</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">childHandler</span><span class="hljs-params">(<span class="hljs-keyword">int</span> unused)</span> </span>{
+  counter += <span class="hljs-number">3</span>;
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"counter = %d\n"</span>, counter);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> *argv[])</span> </span>{
+  signal(SIGUSR1, parentHandler); <span class="hljs-comment">/* the parent register its handler */</span>
+  <span class="hljs-keyword">if</span> ((pid = fork()) == <span class="hljs-number">0</span>) { <span class="hljs-comment">/* for the child */</span>
+    signal(SIGUSR1, childHandler); <span class="hljs-comment">/* the child re-register the handler */</span>
+
+    kill(getppid(), SIGUSR1); <span class="hljs-comment">/* the child sends the parent a signal */</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+  }
+  
+  <span class="hljs-comment">/* for the parent */</span>
+  waitpid(pid, <span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>);
+  counter += <span class="hljs-number">7</span>;
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">"counter = %d\n"</span>, counter);
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>The output depends on the kernel's scheduler. Because the child process may or may not exit before <code>parentHandler</code> has a chance to signal it.</p>
+<pre class="hljs"><code><div>$ ./kill-puzzle
+counter = 1
+counter = 8
+$ ./kill-puzzle
+counter = 1
+counter = 3
+counter = 8
+$
+</div></code></pre>
+<p>Illustrations might be helpful.</p>
+<pre class="hljs"><code><div>            re-register                             Case 1-1:
+            handler     completes  reaped           
+            ┌───◉─────●──●─ ─ ─ ─ ─ - ○             The child exists
+     child  │ c=0     :                             before the parent
+            │         : SIGUSR1                     signals it.
+parent  c=0 │         :        waitpid()            (Version 1)
+──────◉─────┴─────────▽┐         ┌────●────●──▶
+register  fork()       └──●──────┘       (1+7)&quot;8&quot;   print: 1 8
+handler             (0+1)&quot;1&quot;  c=1           c=8
+</div></code></pre>
+<pre class="hljs"><code><div>            re-register                             Case 1-2:
+            handler         completes            
+            ┌───◉─────────●─●─ ─ - ○ reaped         The child exists
+     child  │ c=0         :                         before the parent
+            │             : SIGUSR1                 signals it.
+parent  c=0 │  waitpid()  :  resume:waitpid()       (Version 2)
+──────◉─────┴─────●───────▽┐      ┌●────●─────▶
+register   fork()          └──●───┘   (1+7)&quot;8&quot;      print: 1 8
+handler                 (0+1)&quot;1&quot; c=1     c=8
+</div></code></pre>
+<pre class="hljs"><code><div>            re-register   (0+3)&quot;3&quot;  c=3              Case 2-1:
+            handler          ┌──●─────┐completes             
+            ┌───◉─────●─────△┘        └─●○ reaped    The child didn't
+     child  │ c=0     :     :                        exit before the
+            │  SIGUSR1:     :SIGUSR1                 parent signals it.
+parent  c=0 │         :     :   waitpid()            (Version 1)
+──────◉─────┴─────────▽┐    :    ┌────●────●──▶
+register  fork()       └──●─●────┘       (1+7)&quot;8&quot;    print: 1 3 8
+handler             (0+1)&quot;1&quot;   c=1          c=8
+</div></code></pre>
+<pre class="hljs"><code><div>            re-register   (0+3)&quot;3&quot; c=3               Case 2-2:
+            handler          ┌──●──┐completes             
+            ┌───◉─────●─────△┘     └─●- ○ reaped     The child didn't
+     child  │ c=0     :     :                        exit before the
+            │  SIGUSR1:     :SIGUSR1                 parent signals it.
+parent  c=0 │         :     :   waitpid()            (Version 2)
+──────◉─────┴─────────▽┐    :    ┌──────●──●──▶
+register  fork()       └──●─●────┘       (1+7)&quot;8&quot;    print: 1 3 8
+handler             (0+1)&quot;1&quot;  c=1           c=8
+</div></code></pre>
+<h3 id="266-send-a-signal-to-itself-raise">2.6.6 Send a signal to itself: <code>raise()</code></h3>
+<ul>
+<li>The system call <code>raise()</code> can send a signal to the calling process itself, taking the signal value as its sole argument.</li>
+<li>A typical use is <code>raise(SIGKILL)</code>, which makes a process to commit suicide. For example, you can allow a process to kill itself if it encounters an error.</li>
+</ul>
+<h3 id="267-temporarily-lift-signal-block-and-suspend-for-signal-sigsuspend">2.6.7 Temporarily lift signal block and suspend for signal: <code>sigsuspend()</code></h3>
+<ul>
+<li>The system call <code>sigsuspend()</code> can temporarily override signal block <strong>and suspend the calling process</strong> to wait for the intended signal(s) specified in its argument (of type <code>sigset_t</code>).</li>
+<li>Once the intended signal arrives, the calling process turns to the corresponding signal handler.</li>
+<li>Once the signal handler returns, <code>sigsuspend()</code> will return, and the signal block, if applied before the call to <code>sigsuspend()</code>, will bee restored.</li>
+</ul>
+<p>An example:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">sigset_t</span> additionalMask, exisitngMask;
+sigemptyset(&amp;aditionalMask);
+sigaddset(&amp;additionalMask, SIGCHLD);
+
+<span class="hljs-comment">/* Block SIGCHLD */</span>
+sigprocmask(SIG_BLOCK, &amp;additionalMask, &amp;existingMask);
+
+<span class="hljs-comment">/* your code that needs to be executed
+ * before the SIGCHLD's handler goes here... */</span>
+
+<span class="hljs-keyword">while</span> (hasRunningChild()) {
+  <span class="hljs-comment">/* Temporarily lift the block, suspend the
+   * calling process and wait for SIGCHLD */</span>
+  sigsuspend(&amp;existingMask);
+  <span class="hljs-comment">/* Upon return from the signal handler, 
+   * sigsuspend() also returns, and the
+   * original the signal block is restored */</span>
+}
+
+<span class="hljs-comment">/* Unlock SIGCHLD */</span>
+sigprocmask(SIG_UNBLOCK, &amp;additionalMask, <span class="hljs-literal">NULL</span>);
+</div></code></pre>
+<h6 id="eof">EOF</h6>
+
+        </article>
+    </body>
+</html>
