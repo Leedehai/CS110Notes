@@ -194,7 +194,7 @@ subprocess_t subprocess(const char *command) {
 
       /* redirect the child's stdin FD to the pipe's reading end,
          and de-associate fd[0] from the reading end */
-      dup(fds[0], STDIN_FILENO); 
+      dup2(fds[0], STDIN_FILENO); 
       close(fds[0]);
 
       /* now, execute the intended program (/bin/sh) by execvp() */
